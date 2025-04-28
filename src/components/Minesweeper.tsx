@@ -18,6 +18,14 @@ type Level = {
 
 type GameBoard = Cell[][];
 
+type GameState = {
+  status: "not-started" | "in-progress" | "won" | "lost";
+  flaggedMines: number;
+  remainingCells: number;
+  startTime: number | null;
+  endTime: number | null;
+};
+
 const DIFFICULTY_LEVELS: Record<string, Level> = {
   beginner: {
     width: 9,
@@ -35,6 +43,14 @@ const DIFFICULTY_LEVELS: Record<string, Level> = {
     mines: 99,
   },
 };
+
+const getInitialGameState = (width: number, height: number): GameState => ({
+  status: "not-started",
+  flaggedMines: 0,
+  remainingCells: width * height,
+  startTime: null,
+  endTime: null,
+});
 
 const fillMines = (
   initialClick: { x: number; y: number },
@@ -69,20 +85,83 @@ const fillMines = (
   }
 
   // Update the game board with mines
-  return gameBoard.map((row, rowIndex) =>
+  const boardWithMines = gameBoard.map((row, rowIndex) =>
     row.map((cell, colIndex) => ({
       ...cell,
       isMine: minePositions.has(`${colIndex},${rowIndex}`),
     }))
   );
+
+  // Count adjacent mines for each cell
+  const boardWithAdjacentMines = boardWithMines.map((row, rowIndex) =>
+    row.map((cell, colIndex) => {
+      if (cell.isMine) {
+        return cell;
+      }
+
+      let count = 0;
+      // Check all 8 surrounding cells
+      for (let y = -1; y <= 1; y++) {
+        for (let x = -1; x <= 1; x++) {
+          const cellX = colIndex + x;
+          const cellY = rowIndex + y;
+
+          // Skip the current cell and check bounds
+          if (
+            (x === 0 && y === 0) ||
+            cellX < 0 ||
+            cellX >= width ||
+            cellY < 0 ||
+            cellY >= height
+          ) {
+            continue;
+          }
+
+          if (boardWithMines[cellY][cellX].isMine) {
+            count++;
+          }
+        }
+      }
+
+      return {
+        ...cell,
+        adjacentMines: count,
+      };
+    })
+  );
+
+  return boardWithAdjacentMines;
 };
+
+// const revealCells = (
+//   cell: { x: number; y: number },
+//   gameBoard: GameBoard,
+//   updateGameBoard: (board: GameBoard) => void,
+//   updateGameState: (state: GameState) => void
+// ) => {
+//   const { x, y } = cell;
+//   const { width, height } = gameBoard;
+
+// this function should recursively do the following:
+
+// 1. if x,y is a mine, it should:
+// - update every cell in GameBoard to isRevealed: true
+// - update GameState to status: 'lost' and endTime to the current time
+
+// 2. if x,y is not a mine:
+//   - update the cell in GameBoard to isRevealed: true
+//   -
+
+// };
 
 export const Minesweeper = () => {
   const [difficulty, setDifficulty] =
     useState<keyof typeof DIFFICULTY_LEVELS>("beginner");
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
-  const [hasGameStarted, setHasGameStarted] = useState(false);
+  const [gameState, setGameState] = useState<GameState>(() =>
+    getInitialGameState(currentConfig.width, currentConfig.height)
+  );
 
   const [gameBoard, setGameBoard] = useState<GameBoard>(() =>
     Array.from({ length: currentConfig.height }, () =>
@@ -106,7 +185,9 @@ export const Minesweeper = () => {
         }))
       )
     );
-    setHasGameStarted(false);
+    setGameState(
+      getInitialGameState(currentConfig.width, currentConfig.height)
+    );
   }, [currentConfig.height, currentConfig.width]);
 
   // Reset the game board when difficulty changes
@@ -117,10 +198,14 @@ export const Minesweeper = () => {
   console.log(gameBoard.length, gameBoard[0].length);
 
   const handleCellClick = (x: number, y: number) => {
-    if (!hasGameStarted) {
+    if (gameState.status === "not-started") {
       const newBoard = fillMines({ x, y }, gameBoard, currentConfig);
       setGameBoard(newBoard);
-      setHasGameStarted(true);
+      setGameState((prev) => ({
+        ...prev,
+        status: "in-progress",
+        startTime: Date.now(),
+      }));
     }
   };
 
@@ -152,12 +237,14 @@ export const Minesweeper = () => {
                   onClick={() => handleCellClick(x, y)}
                 >
                   {cell.isMine && "💣"}
+                  {cell.adjacentMines > 0 && cell.adjacentMines}
                 </button>
               ))}
             </div>
           ))}
         </div>
       </div>
+      <pre>{JSON.stringify(gameState, null, 2)}</pre>
     </div>
   );
 };
