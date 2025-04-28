@@ -61,18 +61,30 @@ const fillMines = (
   const { width, height, mines } = difficulty;
 
   // Create a list of all possible positions
-  const allPositions: { x: number; y: number }[] = [];
+  const allCells: { x: number; y: number }[] = [];
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
-      allPositions.push({ x: j, y: i });
+      allCells.push({ x: j, y: i });
     }
   }
 
-  // Remove the initial click position
-  const clickedPosition = `${x},${y}`;
+  // Remove the initial click position and its adjacent cells
+  const safeCells = new Set<string>();
 
-  const availablePositions = allPositions.filter(
-    (pos) => `${pos.x},${pos.y}` !== clickedPosition
+  // Add all 8 adjacent positions
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const adjX = x + dx;
+      const adjY = y + dy;
+      // Skip positions outside the board
+      if (adjX >= 0 && adjX < width && adjY >= 0 && adjY < height) {
+        safeCells.add(`${adjX},${adjY}`);
+      }
+    }
+  }
+
+  const availablePositions = allCells.filter(
+    (pos) => !safeCells.has(`${pos.x},${pos.y}`)
   );
 
   // Randomly select positions for mines
@@ -84,7 +96,7 @@ const fillMines = (
     availablePositions.splice(randomIndex, 1);
   }
 
-  // Update the game board with mines
+  // Create a new board with mines
   const boardWithMines = gameBoard.map((row, rowIndex) =>
     row.map((cell, colIndex) => ({
       ...cell,
@@ -92,43 +104,37 @@ const fillMines = (
     }))
   );
 
-  // Count adjacent mines for each cell
-  const boardWithAdjacentMines = boardWithMines.map((row, rowIndex) =>
-    row.map((cell, colIndex) => {
-      if (cell.isMine) {
-        return cell;
-      }
+  // Only update adjacent cells of mine positions
+  const boardWithAdjacentMines = boardWithMines.map((row) => [...row]);
 
-      let count = 0;
-      // Check all 8 surrounding cells
-      for (let y = -1; y <= 1; y++) {
-        for (let x = -1; x <= 1; x++) {
-          const cellX = colIndex + x;
-          const cellY = rowIndex + y;
+  minePositions.forEach((minePos) => {
+    const [mineX, mineY] = minePos.split(",").map(Number);
 
-          // Skip the current cell and check bounds
-          if (
-            (x === 0 && y === 0) ||
-            cellX < 0 ||
-            cellX >= width ||
-            cellY < 0 ||
-            cellY >= height
-          ) {
-            continue;
-          }
+    // Check all 8 surrounding cells
+    // @todo: this could be further optimized by tracking which cells have already been checked
+    for (let y = -1; y <= 1; y++) {
+      for (let x = -1; x <= 1; x++) {
+        const cellX = mineX + x;
+        const cellY = mineY + y;
 
-          if (boardWithMines[cellY][cellX].isMine) {
-            count++;
-          }
+        // Skip the mine cell itself and check bounds
+        if (
+          (x === 0 && y === 0) ||
+          cellX < 0 ||
+          cellX >= width ||
+          cellY < 0 ||
+          cellY >= height
+        ) {
+          continue;
+        }
+
+        // Increment adjacent mines count for this cell
+        if (!boardWithAdjacentMines[cellY][cellX].isMine) {
+          boardWithAdjacentMines[cellY][cellX].adjacentMines++;
         }
       }
-
-      return {
-        ...cell,
-        adjacentMines: count,
-      };
-    })
-  );
+    }
+  });
 
   return boardWithAdjacentMines;
 };
