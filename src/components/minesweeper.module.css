@@ -1,0 +1,15 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+}
+
+/* @note: rows are not styled for web */
+.row {
+  display: contents;
+}
+
+.cell {
+  aspect-ratio: 1 / 1;
+  border: 1px solid #ccc;
+}
