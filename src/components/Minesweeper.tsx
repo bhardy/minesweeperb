@@ -1,50 +1,32 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import styles from "./minesweeper.module.css";
+import type { Level, GameBoard, GameState } from "../types/minesweeper";
+import { Options } from "./Options";
 
-type Cell = {
-  isMine: boolean;
-  isRevealed: boolean;
-  isFlagged: boolean;
-  adjacentMines: number;
-};
-
-type Level = {
-  width: number;
-  height: number;
-  mines: number;
-};
-
-type GameBoard = Cell[][];
-
-type GameState = {
-  status: "not-started" | "in-progress" | "won" | "lost";
-  flaggedMines: number;
-  remainingCells: number;
-  startTime: number | null;
-  endTime: number | null;
-  config: Level;
-};
-
-const DIFFICULTY_LEVELS: Record<string, Level> = {
-  beginner: {
+export const DIFFICULTY_LEVELS: Level[] = [
+  {
+    name: "beginner",
     width: 9,
     height: 9,
     mines: 10,
   },
-  intermediate: {
+  {
+    name: "intermediate",
     width: 16,
     height: 16,
     mines: 40,
   },
-  expert: {
+  {
+    name: "expert",
     width: 30,
     height: 16,
     mines: 99,
   },
-};
+];
 
 const getInitialGameState = (
   width: number,
@@ -54,8 +36,8 @@ const getInitialGameState = (
   status: "not-started",
   flaggedMines: 0,
   remainingCells: width * height,
-  startTime: null,
-  endTime: null,
+  startTime: undefined,
+  endTime: undefined,
   config,
 });
 
@@ -240,7 +222,7 @@ const revealCells = (
         status: "won",
         flaggedMines: 0,
         remainingCells: 0,
-        startTime: null,
+        startTime: undefined,
         endTime: Date.now(),
       },
     };
@@ -253,8 +235,9 @@ const revealCells = (
 };
 
 export const Minesweeper = () => {
-  const [difficulty, setDifficulty] =
-    useState<keyof typeof DIFFICULTY_LEVELS>("beginner");
+  const searchParams = useSearchParams();
+  const isDebug = searchParams.has("debug");
+  const [difficulty, setDifficulty] = useState<number>(0);
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
   const [gameState, setGameState] = useState<GameState>(() =>
@@ -328,15 +311,23 @@ export const Minesweeper = () => {
   };
 
   return (
-    <div>
-      <button onClick={() => setDifficulty("beginner")}>Beginner</button>
-      <button onClick={() => setDifficulty("intermediate")}>
-        Intermediate
-      </button>
-      <button onClick={() => setDifficulty("expert")}>Expert</button>
-      <button onClick={resetGame}>Reset</button>
+    <div className={styles.minesweeper}>
+      <div className={`${styles.menu} ${styles.options}`}>
+        <Options
+          difficultyLevels={DIFFICULTY_LEVELS}
+          currentDifficulty={difficulty}
+          setDifficulty={setDifficulty}
+        />
+      </div>
+      <div className={styles.menu}>
+        <Count count={currentConfig.mines - gameState.flaggedMines} />
+        <button onClick={resetGame} className={styles.reset}>
+          {gameState.status === "lost" ? "😔" : "☺️"}
+        </button>
+        <Timer startTime={gameState.startTime} endTime={gameState.endTime} />
+      </div>
       <div
-        className={styles.minesweeper}
+        className={styles.board}
         style={
           {
             "--rows": currentConfig.height,
@@ -356,20 +347,76 @@ export const Minesweeper = () => {
                   onClick={() => handleCellClick(x, y)}
                   onContextMenu={(e) => handleRightClick(e, x, y)}
                 >
-                  {cell.isRevealed && (
-                    <>
-                      {cell.isMine && "💣"}
-                      {cell.adjacentMines > 0 && cell.adjacentMines}
-                    </>
-                  )}
-                  {cell.isFlagged && "🚩"}
+                  <span className={styles.item}>
+                    {cell.isRevealed && (
+                      <>
+                        {cell.isMine && "💣"}
+                        {cell.adjacentMines > 0 && cell.adjacentMines}
+                      </>
+                    )}
+                    {cell.isFlagged && "🚩"}
+                  </span>
                 </button>
               ))}
             </div>
           ))}
         </div>
       </div>
-      <pre>{JSON.stringify(gameState, null, 2)}</pre>
+      {isDebug && (
+        <pre
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            color: "white",
+          }}
+        >
+          {JSON.stringify(gameState, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+};
+
+const Timer = ({
+  startTime,
+  endTime,
+}: {
+  startTime?: number;
+  endTime?: number;
+}) => {
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    if (!startTime) {
+      setTime(0);
+      return;
+    }
+
+    if (endTime) {
+      setTime(Math.floor((endTime - startTime) / 1000));
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startTime, endTime]);
+
+  return (
+    <div className={styles.scoreboard}>
+      <span className="text-sm font-bold">{time}</span>
+    </div>
+  );
+};
+
+const Count = ({ count }: { count: number }) => {
+  return (
+    <div className={styles.scoreboard}>
+      <span className="text-sm font-bold">{count}</span>
     </div>
   );
 };
