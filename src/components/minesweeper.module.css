@@ -1,6 +1,14 @@
 .minesweeper {
   align-self: center;
   outline: 2px solid #a4a4a4;
+  --count-1: #0000ff;
+  --count-2: #008000;
+  --count-3: #ff0000;
+  --count-4: #000080;
+  --count-5: #800000;
+  --count-6: #008080;
+  --count-7: #000000;
+  --count-8: #808080;
 }
 
 .grid {
@@ -29,12 +37,43 @@
   background-color: #bbbbbb;
 }
 
-.item {
+.icon {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   font-size: 10px;
+}
+
+.count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--count-color, #555);
+}
+
+.count[data-count="1"] {
+  --count-color: var(--count-1);
+}
+.count[data-count="2"] {
+  --count-color: var(--count-2);
+}
+.count[data-count="3"] {
+  --count-color: var(--count-3);
+}
+.count[data-count="4"] {
+  --count-color: var(--count-4);
+}
+.count[data-count="5"] {
+  --count-color: var(--count-5);
+}
+.count[data-count="6"] {
+  --count-color: var(--count-6);
+}
+.count[data-count="7"] {
+  --count-color: var(--count-7);
+}
+.count[data-count="8"] {
+  --count-color: var(--count-8);
 }
 
 .reset {
@@ -75,4 +114,8 @@
   color: red;
   background-color: black;
   outline: 1px solid #a4a4a4;
+}
+
+.victory .scoreboard {
+  color: #00ff00;
 }

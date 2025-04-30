@@ -220,9 +220,7 @@ const revealCells = (
       gameState: {
         ...gameState,
         status: "won",
-        flaggedMines: 0,
         remainingCells: 0,
-        startTime: undefined,
         endTime: Date.now(),
       },
     };
@@ -307,7 +305,20 @@ export const Minesweeper = () => {
       )
     );
 
+    // Calculate the new flag count
+    // @todo: should I be counting these or just maintain the count in game state?
+    const newFlagCount = newBoard.reduce(
+      (count, row) =>
+        count +
+        row.reduce((rowCount, cell) => rowCount + (cell.isFlagged ? 1 : 0), 0),
+      0
+    );
+
     setGameBoard(newBoard);
+    setGameState((prevState) => ({
+      ...prevState,
+      flaggedMines: newFlagCount,
+    }));
   };
 
   return (
@@ -319,7 +330,11 @@ export const Minesweeper = () => {
           setDifficulty={setDifficulty}
         />
       </div>
-      <div className={styles.menu}>
+      <div
+        className={classNames(styles.menu, {
+          [styles.victory]: gameState.status === "won",
+        })}
+      >
         <Count count={currentConfig.mines - gameState.flaggedMines} />
         <button onClick={resetGame} className={styles.reset}>
           {gameState.status === "lost" ? "😔" : "☺️"}
@@ -347,15 +362,18 @@ export const Minesweeper = () => {
                   onClick={() => handleCellClick(x, y)}
                   onContextMenu={(e) => handleRightClick(e, x, y)}
                 >
-                  <span className={styles.item}>
-                    {cell.isRevealed && (
-                      <>
-                        {cell.isMine && "💣"}
+                  {cell.isRevealed && (
+                    <>
+                      <span className={styles.icon}>{cell.isMine && "💣"}</span>
+                      <span
+                        className={styles.count}
+                        data-count={cell.adjacentMines}
+                      >
                         {cell.adjacentMines > 0 && cell.adjacentMines}
-                      </>
-                    )}
-                    {cell.isFlagged && "🚩"}
-                  </span>
+                      </span>
+                    </>
+                  )}
+                  <span className={styles.icon}>{cell.isFlagged && "🚩"}</span>
                 </button>
               ))}
             </div>

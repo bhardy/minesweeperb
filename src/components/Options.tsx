@@ -28,8 +28,12 @@ export function Options({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-none p-2">
-          Game
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-none p-2 text-xs"
+        >
+          Settings
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
