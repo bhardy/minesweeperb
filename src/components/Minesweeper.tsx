@@ -282,7 +282,8 @@ export const Minesweeper = () => {
     resetGame();
   }, [difficulty, resetGame]);
 
-  const handleCellClick = (x: number, y: number) => {
+  // @todo: this is a mess!
+  const handlePrimaryAction = (x: number, y: number) => {
     const { gameBoard: nextGameBoard, gameState: nextGameState } = revealCells(
       { x, y },
       gameBoard,
@@ -293,7 +294,7 @@ export const Minesweeper = () => {
     setGameState(nextGameState);
   };
 
-  const handleRightClick = (e: React.MouseEvent, x: number, y: number) => {
+  const handleSecondaryAction = (e: React.MouseEvent, x: number, y: number) => {
     e.preventDefault(); // Prevent context menu from appearing
     if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
 
@@ -359,8 +360,8 @@ export const Minesweeper = () => {
                   className={classNames(styles.cell, {
                     [styles.revealed]: cell.isRevealed,
                   })}
-                  onClick={() => handleCellClick(x, y)}
-                  onContextMenu={(e) => handleRightClick(e, x, y)}
+                  onClick={() => handlePrimaryAction(x, y)}
+                  onContextMenu={(e) => handleSecondaryAction(e, x, y)}
                 >
                   {cell.isRevealed && (
                     <>
