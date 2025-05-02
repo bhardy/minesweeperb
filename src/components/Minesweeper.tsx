@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import styles from "./minesweeper.module.css";
@@ -11,6 +11,7 @@ import type {
   GameState as GameStateType,
   Cell as CellType,
 } from "../types/minesweeper";
+import { useLongPress } from "react-use";
 
 export const DIFFICULTY_LEVELS: LevelType[] = [
   {
@@ -299,9 +300,7 @@ export const Minesweeper = () => {
     setGameState(nextGameState);
   };
 
-  const handleSecondaryAction = (e: React.MouseEvent, x: number, y: number) => {
-    e.preventDefault(); // Prevent context menu from appearing
-
+  const handleSecondaryAction = (x: number, y: number) => {
     if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
 
     const newBoard = gameBoard.map((row, rowIndex) =>
@@ -448,19 +447,46 @@ const Cell = ({
   x: number;
   y: number;
   onPrimaryAction: (x: number, y: number) => void;
-  onSecondaryAction: (e: React.MouseEvent, x: number, y: number) => void;
+  onSecondaryAction: (x: number, y: number) => void;
 }) => {
+  const [hasLongPressed, setHasLongPressed] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const onLongPress = useCallback(
+    (e: MouseEvent | TouchEvent) => {
+      e.preventDefault();
+      setHasLongPressed(true);
+      onSecondaryAction(x, y);
+      buttonRef.current?.blur();
+    },
+    [onSecondaryAction, x, y]
+  );
+
+  const onClick = useCallback(() => {
+    if (!hasLongPressed) {
+      onPrimaryAction(x, y);
+    }
+    setHasLongPressed(false);
+  }, [onPrimaryAction, x, y, hasLongPressed]);
+
+  const longPressEvent = useLongPress(onLongPress, {
+    isPreventDefault: true,
+    delay: 250,
+  });
+
   return (
     <button
+      ref={buttonRef}
       key={`${x}-${y}`}
       className={classNames(styles.cell, "font-mono", {
         [styles.revealed]: cell.isRevealed,
         [styles.flagged]: cell.isFlagged,
       })}
-      onClick={() => onPrimaryAction(x, y)}
+      onClick={onClick}
+      {...longPressEvent}
       onContextMenu={(e) => {
-        onSecondaryAction(e, x, y);
-        // @note: this avoids an ugly case where the cell is focused after unflagging
+        e.preventDefault();
+        onSecondaryAction(x, y);
         e.currentTarget.blur();
       }}
     >
