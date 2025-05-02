@@ -181,6 +181,14 @@ const revealCells = (
     };
   }
 
+  // Skip if cell is flagged - @note: this only matters if the user flagged a safe cell
+  if (gameBoard[y][x].isFlagged) {
+    return {
+      gameBoard: gameBoard,
+      gameState: gameState,
+    };
+  }
+
   // Reveal the current cell
   let newBoard = gameBoard.map((row, rowIndex) =>
     row.map((cell, colIndex) =>
