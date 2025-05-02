@@ -4,10 +4,15 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import styles from "./minesweeper.module.css";
-import type { Level, GameBoard, GameState } from "../types/minesweeper";
 import { Options } from "./Options";
+import type {
+  Level as LevelType,
+  GameBoard as GameBoardType,
+  GameState as GameStateType,
+  Cell as CellType,
+} from "../types/minesweeper";
 
-export const DIFFICULTY_LEVELS: Level[] = [
+export const DIFFICULTY_LEVELS: LevelType[] = [
   {
     name: "beginner",
     width: 9,
@@ -31,8 +36,8 @@ export const DIFFICULTY_LEVELS: Level[] = [
 const getInitialGameState = (
   width: number,
   height: number,
-  config: Level
-): GameState => ({
+  config: LevelType
+): GameStateType => ({
   status: "not-started",
   flaggedMines: 0,
   remainingCells: width * height,
@@ -43,8 +48,8 @@ const getInitialGameState = (
 
 const fillMines = (
   initialClick: { x: number; y: number },
-  gameBoard: GameBoard,
-  difficulty: Level
+  gameBoard: GameBoardType,
+  difficulty: LevelType
 ) => {
   const { x, y } = initialClick;
   const { width, height, mines } = difficulty;
@@ -130,11 +135,11 @@ const fillMines = (
 
 const revealCells = (
   cell: { x: number; y: number },
-  gameBoard: GameBoard,
-  gameState: GameState
+  gameBoard: GameBoardType,
+  gameState: GameStateType
 ): {
-  gameBoard: GameBoard;
-  gameState: GameState;
+  gameBoard: GameBoardType;
+  gameState: GameStateType;
 } => {
   const { x, y } = cell;
   const width = gameBoard[0].length;
@@ -238,7 +243,7 @@ export const Minesweeper = () => {
   const [difficulty, setDifficulty] = useState<number>(0);
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
-  const [gameState, setGameState] = useState<GameState>(() =>
+  const [gameState, setGameState] = useState<GameStateType>(() =>
     getInitialGameState(
       currentConfig.width,
       currentConfig.height,
@@ -246,7 +251,7 @@ export const Minesweeper = () => {
     )
   );
 
-  const [gameBoard, setGameBoard] = useState<GameBoard>(() =>
+  const [gameBoard, setGameBoard] = useState<GameBoardType>(() =>
     Array.from({ length: currentConfig.height }, () =>
       Array.from({ length: currentConfig.width }, () => ({
         isMine: false,
@@ -282,8 +287,8 @@ export const Minesweeper = () => {
     resetGame();
   }, [difficulty, resetGame]);
 
-  // @todo: this is a mess!
   const handlePrimaryAction = (x: number, y: number) => {
+    if (gameBoard[y][x].isFlagged) return;
     const { gameBoard: nextGameBoard, gameState: nextGameState } = revealCells(
       { x, y },
       gameBoard,
@@ -296,6 +301,7 @@ export const Minesweeper = () => {
 
   const handleSecondaryAction = (e: React.MouseEvent, x: number, y: number) => {
     e.preventDefault(); // Prevent context menu from appearing
+
     if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
 
     const newBoard = gameBoard.map((row, rowIndex) =>
@@ -338,7 +344,11 @@ export const Minesweeper = () => {
       >
         <Count count={currentConfig.mines - gameState.flaggedMines} />
         <button onClick={resetGame} className={styles.reset}>
-          {gameState.status === "lost" ? "😔" : "☺️"}
+          {gameState.status === "won"
+            ? "😁"
+            : gameState.status === "lost"
+            ? "😔"
+            : "🙂"}
         </button>
         <Timer startTime={gameState.startTime} endTime={gameState.endTime} />
       </div>
@@ -355,27 +365,14 @@ export const Minesweeper = () => {
           {gameBoard.map((row, y) => (
             <div key={y} className={styles.row}>
               {row.map((cell, x) => (
-                <button
+                <Cell
                   key={`${x}-${y}`}
-                  className={classNames(styles.cell, {
-                    [styles.revealed]: cell.isRevealed,
-                  })}
-                  onClick={() => handlePrimaryAction(x, y)}
-                  onContextMenu={(e) => handleSecondaryAction(e, x, y)}
-                >
-                  {cell.isRevealed && (
-                    <>
-                      <span className={styles.icon}>{cell.isMine && "💣"}</span>
-                      <span
-                        className={styles.count}
-                        data-count={cell.adjacentMines}
-                      >
-                        {cell.adjacentMines > 0 && cell.adjacentMines}
-                      </span>
-                    </>
-                  )}
-                  <span className={styles.icon}>{cell.isFlagged && "🚩"}</span>
-                </button>
+                  cell={cell}
+                  x={x}
+                  y={y}
+                  onPrimaryAction={handlePrimaryAction}
+                  onSecondaryAction={handleSecondaryAction}
+                />
               ))}
             </div>
           ))}
@@ -437,5 +434,49 @@ const Count = ({ count }: { count: number }) => {
     <div className={styles.scoreboard}>
       <span className="text-sm font-bold">{count}</span>
     </div>
+  );
+};
+
+const Cell = ({
+  cell,
+  x,
+  y,
+  onPrimaryAction,
+  onSecondaryAction,
+}: {
+  cell: CellType;
+  x: number;
+  y: number;
+  onPrimaryAction: (x: number, y: number) => void;
+  onSecondaryAction: (e: React.MouseEvent, x: number, y: number) => void;
+}) => {
+  return (
+    <button
+      key={`${x}-${y}`}
+      className={classNames(styles.cell, "font-mono", {
+        [styles.revealed]: cell.isRevealed,
+        [styles.flagged]: cell.isFlagged,
+      })}
+      onClick={() => onPrimaryAction(x, y)}
+      onContextMenu={(e) => {
+        onSecondaryAction(e, x, y);
+        // @note: this avoids an ugly case where the cell is focused after unflagging
+        e.currentTarget.blur();
+      }}
+    >
+      {cell.isRevealed && (
+        <>
+          {cell.isMine && (
+            <span className={styles.icon}>{cell.isMine && "💣"}</span>
+          )}
+          {cell.adjacentMines > 0 && (
+            <span className={styles.count} data-count={cell.adjacentMines}>
+              {cell.adjacentMines > 0 && cell.adjacentMines}
+            </span>
+          )}
+        </>
+      )}
+      <span className={styles.icon}>{cell.isFlagged && "🚩"}</span>
+    </button>
   );
 };

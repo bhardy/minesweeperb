@@ -26,10 +26,22 @@
 .cell {
   position: relative;
   aspect-ratio: 1 / 1;
-  border: 4px solid #ffffff;
+  border: 3px solid #ffffff;
   border-right-color: #919191;
   border-bottom-color: #919191;
   background-color: #d6d6d6;
+  overflow: hidden;
+}
+
+.cell:hover:not(.revealed):not(.flagged) {
+  background-color: #cbcbcb;
+}
+
+.cell:focus:not(.flagged):not(.revealed) {
+  background-color: #bbbbbb;
+  border: none;
+  border-top: 2px solid #919191;
+  border-left: 2px solid #919191;
 }
 
 .cell.revealed {
