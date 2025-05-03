@@ -478,7 +478,7 @@ const Cell = ({
   }, [onPrimaryAction, x, y, hasLongPressed]);
 
   const longPressEvent = useLongPress(onLongPress, {
-    isPreventDefault: true,
+    isPreventDefault: false,
     delay: 250,
   });
 
@@ -510,7 +510,7 @@ const Cell = ({
           )}
         </>
       )}
-      <span className={styles.icon}>{cell.isFlagged && "🚩"}</span>
+      {cell.isFlagged && <span className={styles.icon}>🚩</span>}
     </button>
   );
 };

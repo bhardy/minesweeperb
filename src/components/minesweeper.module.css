@@ -31,6 +31,10 @@
   border-bottom-color: #919191;
   background-color: #d6d6d6;
   overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cell:hover:not(.revealed):not(.flagged) {
@@ -55,12 +59,18 @@
   top: 50%;
   transform: translate(-50%, -50%);
   font-size: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .count {
   font-size: 14px;
   font-weight: 600;
   color: var(--count-color, #555);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .count[data-count="1"] {
