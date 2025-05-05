@@ -8,6 +8,12 @@
 - [x] disable clicking on flagged items
 - [ ] use custom svgs, not emojis
 - [x] reveal should not reveal a flagged mine
+- [x] add custom hook to handle long press
+- [ ] usePressHandler should not fire the event if the user drags
+- [x] fix right clicking
+- [ ] update focus styling
+- [ ] animate mine placement
+- [x] fix mobile layout
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

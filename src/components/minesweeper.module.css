@@ -1,5 +1,5 @@
 .minesweeper {
-  align-self: center;
+  display: inline-block;
   outline: 2px solid #a4a4a4;
   --count-1: #0000ff;
   --count-2: #008000;
