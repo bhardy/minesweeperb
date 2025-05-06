@@ -35,6 +35,7 @@
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .cell:hover:not(.revealed):not(.flagged) {
@@ -46,6 +47,10 @@
   border: none;
   border-top: 2px solid #919191;
   border-left: 2px solid #919191;
+}
+
+.cell:focus-visible {
+  outline: none;
 }
 
 .cell.revealed {
@@ -83,6 +88,10 @@
 }
 
 .count {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   font-size: 14px;
   font-weight: 600;
   color: var(--count-color, #555);

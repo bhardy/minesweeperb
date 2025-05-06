@@ -297,6 +297,7 @@ export const Minesweeper = () => {
   }, [difficulty, resetGame]);
 
   const handlePrimaryAction = (x: number, y: number) => {
+    if (gameState.status === "won") return;
     if (gameBoard[y][x].isFlagged) return;
     const { gameBoard: nextGameBoard, gameState: nextGameState } = revealCells(
       { x, y },

@@ -7,12 +7,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Level } from "@/types/minesweeper";
+import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 
 interface OptionsProps {
   difficultyLevels: Level[];
@@ -33,10 +35,10 @@ export function Options({
           size="sm"
           className="rounded-none p-2 text-xs"
         >
-          Settings
+          Game
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className="w-48">
         <DropdownMenuLabel>Select Difficulty</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
@@ -49,6 +51,10 @@ export function Options({
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>View Records</DropdownMenuItem>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
