@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <main className="p-4 items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
+    <main className="min-h-screen font-[family-name:var(--font-geist-sans)]">
       <Suspense>
         <Minesweeper />
       </Suspense>

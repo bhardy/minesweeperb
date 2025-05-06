@@ -23,24 +23,54 @@ export function usePressHandler({
   const targetRef = useRef<HTMLElement | null>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
   const isHoldingRef = useRef(false);
-
   const isRightClickRef = useRef(false);
+  const initialPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const isScrollingRef = useRef(false);
+
+  const handlePointerMove = useCallback((e: PointerEvent) => {
+    if (!initialPositionRef.current) return;
+
+    const dx = Math.abs(e.clientX - initialPositionRef.current.x);
+    const dy = Math.abs(e.clientY - initialPositionRef.current.y);
+
+    // @note: arbitrarily setting 3px as the threshold for scrolling
+    if (dx > 3 || dy > 3) {
+      isScrollingRef.current = true;
+      clearTimeout(timeoutRef.current);
+      document.removeEventListener("pointermove", handlePointerMove);
+      targetRef.current?.blur();
+    }
+  }, []);
 
   const handlePointerUp = useCallback(() => {
     document.removeEventListener("pointerup", handlePointerUp);
+    document.removeEventListener("pointermove", handlePointerMove);
 
     clearTimeout(timeoutRef.current);
+    initialPositionRef.current = null;
 
-    // Only fire click if we aren't holding or are right clicking
-    if (!isHoldingRef.current || isRightClickRef.current) {
+    // Only fire click if we aren't holding, aren't scrolling, and aren't right clicking
+    if (
+      !isHoldingRef.current &&
+      !isScrollingRef.current &&
+      !isRightClickRef.current
+    ) {
       onClick?.();
     }
 
+    isScrollingRef.current = false;
     targetRef.current?.blur();
-  }, [onClick]);
+  }, [onClick, handlePointerMove]);
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
+      // Check for multi-touch by looking at the number of active touches
+      const nativeEvent = e.nativeEvent as unknown as TouchEvent;
+      if (e.pointerType === "touch" && nativeEvent.touches?.length > 1) {
+        targetRef.current?.blur();
+        return;
+      }
+
       // if the user is holding right click we don't fire the onHold
       if (e.button === 2) {
         isRightClickRef.current = true;
@@ -49,16 +79,22 @@ export function usePressHandler({
 
       isHoldingRef.current = false;
       isRightClickRef.current = false;
+      isScrollingRef.current = false;
+      initialPositionRef.current = { x: e.clientX, y: e.clientY };
       targetRef.current?.focus();
 
+      document.addEventListener("pointermove", handlePointerMove);
+
       timeoutRef.current = window.setTimeout(() => {
-        isHoldingRef.current = true;
-        onHold?.();
+        if (!isScrollingRef.current) {
+          isHoldingRef.current = true;
+          onHold?.();
+        }
       }, holdDuration);
 
       document.addEventListener("pointerup", handlePointerUp);
     },
-    [holdDuration, handlePointerUp, onHold]
+    [holdDuration, handlePointerUp, onHold, handlePointerMove]
   );
 
   const onContextMenu = (e: React.MouseEvent<HTMLElement>) => {

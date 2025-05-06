@@ -487,7 +487,9 @@ const Cell = ({
           )}
         </>
       )}
-      {cell.isFlagged && <span className={styles.icon}>🚩</span>}
+      {cell.isFlagged && (
+        <span className={classNames(styles.icon, styles.flag)}>🚩</span>
+      )}
     </button>
   );
 };
