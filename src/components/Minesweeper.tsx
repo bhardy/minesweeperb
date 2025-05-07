@@ -12,6 +12,8 @@ import type {
   Cell as CellType,
 } from "../types/minesweeper";
 import { usePressHandler } from "../hooks/usePressHandler";
+import { BestTimesDialog } from "./BestTimesDialog";
+import { BEST_TIMES_KEY } from "../types/consts";
 
 export const DIFFICULTY_LEVELS: LevelType[] = [
   {
@@ -246,6 +248,32 @@ const revealCells = (
   };
 };
 
+interface BestTime {
+  name: string;
+  time: number;
+  date: string;
+}
+
+const getBestTimes = (): Record<string, BestTime> => {
+  const times = localStorage.getItem(BEST_TIMES_KEY);
+  return times ? JSON.parse(times) : {};
+};
+
+const saveBestTime = (difficulty: string, name: string, time: number) => {
+  const times = getBestTimes();
+  times[difficulty] = {
+    name,
+    time,
+    date: new Date().toISOString(),
+  };
+  localStorage.setItem(BEST_TIMES_KEY, JSON.stringify(times));
+};
+
+const isNewBestTime = (difficulty: string, time: number): boolean => {
+  const times = getBestTimes();
+  return !times[difficulty] || time < times[difficulty].time;
+};
+
 export const Minesweeper = () => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
@@ -270,6 +298,9 @@ export const Minesweeper = () => {
       }))
     )
   );
+
+  const [showBestTimeDialog, setShowBestTimeDialog] = useState(false);
+  const [winTime, setWinTime] = useState<number | null>(null);
 
   const resetGame = useCallback(() => {
     setGameBoard(
@@ -336,6 +367,38 @@ export const Minesweeper = () => {
     }));
   };
 
+  // Modify the revealCells function to handle high scores
+  const handleGameWin = useCallback(
+    (time: number) => {
+      const difficulty = currentConfig.name;
+      if (isNewBestTime(difficulty, time)) {
+        setWinTime(time);
+        setShowBestTimeDialog(true);
+      }
+    },
+    [currentConfig.name]
+  );
+
+  // Checking if we have a new best time wh en the game is won
+  useEffect(() => {
+    if (
+      gameState.status === "won" &&
+      gameState.endTime &&
+      gameState.startTime
+    ) {
+      const time = Math.floor((gameState.endTime - gameState.startTime) / 1000);
+      handleGameWin(time);
+    }
+  }, [handleGameWin, gameState.status, gameState.endTime, gameState.startTime]);
+
+  const handleBestTimeSubmit = (name: string) => {
+    if (winTime !== null) {
+      saveBestTime(currentConfig.name, name, winTime);
+      setShowBestTimeDialog(false);
+      setWinTime(null);
+    }
+  };
+
   return (
     <div className={styles.minesweeper}>
       <div className={`${styles.menu} ${styles.options}`}>
@@ -399,6 +462,13 @@ export const Minesweeper = () => {
           {JSON.stringify(gameState, null, 2)}
         </pre>
       )}
+      <BestTimesDialog
+        isOpen={showBestTimeDialog}
+        onClose={() => setShowBestTimeDialog(false)}
+        onSubmit={handleBestTimeSubmit}
+        time={winTime || 0}
+        difficulty={currentConfig.name}
+      />
     </div>
   );
 };

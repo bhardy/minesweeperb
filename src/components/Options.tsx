@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Level } from "@/types/minesweeper";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
+import { RecordsDialog } from "./RecordsDialog";
 
 interface OptionsProps {
   difficultyLevels: Level[];
@@ -27,35 +28,44 @@ export function Options({
   currentDifficulty,
   setDifficulty,
 }: OptionsProps) {
+  const [recordsOpen, setRecordsOpen] = React.useState(false);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-none p-2 text-xs"
-        >
-          Game
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48">
-        <DropdownMenuLabel>Select Difficulty</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup
-          value={currentDifficulty.toString()}
-          onValueChange={(value) => setDifficulty(parseInt(value))}
-        >
-          {difficultyLevels.map((level, index) => (
-            <DropdownMenuRadioItem key={level.name} value={index.toString()}>
-              {level.name.charAt(0).toUpperCase() + level.name.slice(1)}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>View Records</DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-none p-2 text-xs"
+          >
+            Game
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-48">
+          <DropdownMenuLabel>Select Difficulty</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup
+            value={currentDifficulty.toString()}
+            onValueChange={(value) => setDifficulty(parseInt(value))}
+          >
+            {difficultyLevels.map((level, index) => (
+              <DropdownMenuRadioItem key={level.name} value={index.toString()}>
+                {level.name.charAt(0).toUpperCase() + level.name.slice(1)}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem onSelect={() => setRecordsOpen(true)}>
+              View Records
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {recordsOpen && (
+        <RecordsDialog isOpen={true} onClose={() => setRecordsOpen(false)} />
+      )}
+    </>
   );
 }
