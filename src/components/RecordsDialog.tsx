@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BEST_TIMES_KEY } from "../types/consts";
+import { BEST_TIMES_KEY } from "../types/constants";
 
 interface BestTime {
   name: string;
@@ -55,7 +55,7 @@ export const RecordsDialog = ({ isOpen, onClose }: RecordsDialogProps) => {
                 <div key={difficulty} className="space-y-1">
                   <h3 className="font-semibold capitalize">{difficulty}</h3>
                   <div className="text-sm">
-                    {record.name} ~ {record.time} seconds
+                    {record.name}: {record.time} seconds
                   </div>
                 </div>
               ))}

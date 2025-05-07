@@ -58,7 +58,7 @@ export function Options({
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem onSelect={() => setRecordsOpen(true)}>
-              View Records
+              View Best Times
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Input } from "./ui/input";
 import {
   Dialog,
@@ -8,8 +7,11 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { LATEST_USERNAME_KEY } from "../types/constants";
+import useLocalStorage from "use-local-storage";
 
-interface BestTimesDialogProps {
+interface NewBestTimeProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (name: string) => void;
@@ -17,20 +19,19 @@ interface BestTimesDialogProps {
   difficulty: string;
 }
 
-export const BestTimesDialog = ({
+export const NewBestTime = ({
   isOpen,
   onClose,
   onSubmit,
   time,
   difficulty,
-}: BestTimesDialogProps) => {
-  const [name, setName] = useState("");
+}: NewBestTimeProps) => {
+  const [name, setName] = useLocalStorage(LATEST_USERNAME_KEY, "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
+    if (name?.trim()) {
       onSubmit(name.trim());
-      setName("");
     }
   };
 
@@ -44,10 +45,14 @@ export const BestTimesDialog = ({
           You completed {difficulty} difficulty in {time} seconds!
         </p>
         <form onSubmit={handleSubmit}>
+          <Label htmlFor="user-name" className="mb-2">
+            Your name
+          </Label>
           <Input
+            id="user-name"
             type="text"
             placeholder="Enter your name"
-            value={name}
+            value={name ?? ""}
             onChange={(e) => setName(e.target.value.slice(0, 15))}
             maxLength={15}
             className="mb-4"
@@ -58,7 +63,7 @@ export const BestTimesDialog = ({
             <Button onClick={onClose} variant="outline">
               Cancel
             </Button>
-            <Button type="submit" disabled={!name}>
+            <Button type="submit" disabled={!name?.trim()}>
               Save
             </Button>
           </DialogFooter>

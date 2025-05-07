@@ -12,8 +12,8 @@ import type {
   Cell as CellType,
 } from "../types/minesweeper";
 import { usePressHandler } from "../hooks/usePressHandler";
-import { BestTimesDialog } from "./BestTimesDialog";
-import { BEST_TIMES_KEY } from "../types/consts";
+import { NewBestTime } from "./NewBestTime";
+import { BEST_TIMES_KEY } from "../types/constants";
 
 export const DIFFICULTY_LEVELS: LevelType[] = [
   {
@@ -462,7 +462,7 @@ export const Minesweeper = () => {
           {JSON.stringify(gameState, null, 2)}
         </pre>
       )}
-      <BestTimesDialog
+      <NewBestTime
         isOpen={showBestTimeDialog}
         onClose={() => setShowBestTimeDialog(false)}
         onSubmit={handleBestTimeSubmit}

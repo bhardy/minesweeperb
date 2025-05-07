@@ -28,6 +28,9 @@ export function usePressHandler({
   const isScrollingRef = useRef(false);
 
   const handlePointerMove = useCallback((e: PointerEvent) => {
+    // Only detect scrolling for touch events
+    if (e.pointerType !== "touch") return;
+
     if (!initialPositionRef.current) return;
 
     const dx = Math.abs(e.clientX - initialPositionRef.current.x);
