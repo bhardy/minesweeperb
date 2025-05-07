@@ -15,7 +15,8 @@
 - [x] animate mine placement
 - [x] fix mobile layout
 - [x] lock the game once you're in a win state (currently the user can click an unflagged mine and move from a win to a loss)
-- [ ] improve UX on clicking quick -- currently some clicks are being lost
+- [x] improve UX on clicking quick -- currently some clicks are being lost
+- [ ] mobile styles -- lock the chrome to the viewport
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

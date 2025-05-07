@@ -55,7 +55,8 @@ export const RecordsDialog = ({ isOpen, onClose }: RecordsDialogProps) => {
                 <div key={difficulty} className="space-y-1">
                   <h3 className="font-semibold capitalize">{difficulty}</h3>
                   <div className="text-sm">
-                    {record.name}: {record.time} seconds
+                    <span className="font-semibold">{record.name}</span>:{" "}
+                    {record.time} seconds
                   </div>
                 </div>
               ))}

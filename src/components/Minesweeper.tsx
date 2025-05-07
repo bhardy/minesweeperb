@@ -416,7 +416,7 @@ export const Minesweeper = () => {
         <Count count={currentConfig.mines - gameState.flaggedMines} />
         <button onClick={resetGame} className={styles.reset}>
           {gameState.status === "won"
-            ? "😁"
+            ? "😎"
             : gameState.status === "lost"
             ? "😔"
             : "🙂"}
