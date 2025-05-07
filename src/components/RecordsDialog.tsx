@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BEST_TIMES_KEY } from "../types/constants";
+import { BEST_TIMES_KEY } from "@/types/constants";
 
 interface BestTime {
   name: string;

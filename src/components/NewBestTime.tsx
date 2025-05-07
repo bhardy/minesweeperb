@@ -8,7 +8,7 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { LATEST_USERNAME_KEY } from "../types/constants";
+import { LATEST_USERNAME_KEY } from "@/types/constants";
 import useLocalStorage from "use-local-storage";
 
 interface NewBestTimeProps {

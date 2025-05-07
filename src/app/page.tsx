@@ -1,4 +1,4 @@
-import { Minesweeper } from "@/components/Minesweeper";
+import { Minesweeper } from "@/components/Minesweeper/Minesweeper";
 import { Suspense } from "react";
 
 export default function Home() {
