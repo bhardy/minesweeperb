@@ -23,7 +23,9 @@
 - [ ] seeded mode should account for difficulty
 - [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
 - [ ] supply seed when game complete
-- [ ] only update high score for non-seeded rounds
+- [x] only update high score for non-seeded rounds
+- [ ] re-enable dismissing the new best time dialog
+- [ ] add daily challenge mode, using seeds
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

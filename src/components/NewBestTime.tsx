@@ -4,7 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
+  DialogDescription,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -13,7 +13,6 @@ import useLocalStorage from "use-local-storage";
 
 interface NewBestTimeProps {
   isOpen: boolean;
-  onClose: () => void;
   onSubmit: (name: string) => void;
   time: number;
   difficulty: string;
@@ -22,7 +21,6 @@ interface NewBestTimeProps {
 
 export const NewBestTime = ({
   isOpen,
-  onClose,
   onSubmit,
   time,
   difficulty,
@@ -38,52 +36,55 @@ export const NewBestTime = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
+    <Dialog open={isOpen}>
+      <DialogContent
+        onPointerDownOutside={(e) => e.preventDefault()}
+        hideCloseButton
+      >
         <DialogHeader>
           <DialogTitle>{seed ? "You Won!" : "New Best Time!"}</DialogTitle>
         </DialogHeader>
-        {seed ? (
-          <>
-            <p>
+        <DialogDescription>
+          {seed ? (
+            <span className="text-black">
               You completed seed <b>{seed}</b> on <b>{difficulty}</b> difficulty{" "}
               in <b>{time}</b> seconds!
-            </p>
-            <p className="text-gray-500 text-sm text-center">
-              Best times from seeded rounds are not saved
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="mb-2">
+            </span>
+          ) : (
+            <span className="text-black">
               You completed <b>{difficulty}</b> difficulty in <b>{time}</b>{" "}
               seconds!
-            </p>
-            <form onSubmit={handleSubmit}>
-              <Label htmlFor="user-name" className="mb-2">
-                Your name
-              </Label>
-              <Input
-                id="user-name"
-                type="text"
-                placeholder="Enter your name"
-                value={name ?? ""}
-                onChange={(e) => setName(e.target.value.slice(0, 15))}
-                maxLength={15}
-                className="mb-4"
-                autoFocus
-                autoComplete="off"
-              />
-              <DialogFooter>
-                <Button onClick={onClose} variant="outline">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={!name?.trim()}>
-                  Save
-                </Button>
-              </DialogFooter>
-            </form>
-          </>
+            </span>
+          )}
+        </DialogDescription>
+        {seed ? (
+          <p className="text-gray-500 text-sm text-center">
+            Best times from seeded rounds are not saved
+          </p>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-2">
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <Label htmlFor="record-holder" className="mb-2">
+                  Your name
+                </Label>
+                <Input
+                  id="record-holder"
+                  type="text"
+                  name="recordHolder"
+                  placeholder="Enter your name"
+                  value={name ?? ""}
+                  onChange={(e) => setName(e.target.value.slice(0, 15))}
+                  maxLength={15}
+                  autoFocus
+                  autoComplete="off"
+                />
+              </div>
+              <Button type="submit" disabled={!name?.trim()}>
+                Save
+              </Button>
+            </div>
+          </form>
         )}
       </DialogContent>
     </Dialog>

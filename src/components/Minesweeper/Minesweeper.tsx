@@ -68,12 +68,9 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
         seed
       )
     );
+    setShowBestTimeDialog(false);
+    setWinTime(null);
   }, [currentConfig, seed]);
-
-  // Reset the game board when difficulty changes
-  useEffect(() => {
-    resetGame();
-  }, [difficulty, resetGame]);
 
   const handlePrimaryAction = (x: number, y: number) => {
     if (gameState.status === "won") return;
@@ -113,20 +110,20 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
     }));
   };
 
-  // @todo: this needs to be updated as NewBestTime is shared for seed and non-seeded games
   const handleGameWin = useCallback(
     (time: number) => {
       const difficulty = currentConfig.name;
-      if (isNewBestTime(difficulty, time)) {
+      console.log("handleGameWin");
+      if (isNewBestTime(difficulty, time) && !showBestTimeDialog) {
         setWinTime(time);
         setShowBestTimeDialog(true);
       }
-      if (seed) {
+      if (seed && !showBestTimeDialog) {
         setWinTime(time);
         setShowBestTimeDialog(true);
       }
     },
-    [currentConfig.name, seed]
+    [currentConfig.name, seed, showBestTimeDialog]
   );
 
   useEffect(() => {
@@ -147,6 +144,10 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
       setWinTime(null);
     }
   };
+
+  useEffect(() => {
+    resetGame();
+  }, [difficulty, resetGame]);
 
   return (
     <div className={styles.minesweeper}>
@@ -199,7 +200,6 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
       )}
       <NewBestTime
         isOpen={showBestTimeDialog}
-        onClose={() => setShowBestTimeDialog(false)}
         onSubmit={handleBestTimeSubmit}
         time={winTime || 0}
         difficulty={currentConfig.name}
