@@ -6,29 +6,17 @@ import type {
 } from "@/types/minesweeper";
 import { BEST_TIMES_KEY } from "@/types/constants";
 
-export const getInitialGameState = (
+// Helper function to generate deterministic mine positions based on a date
+// @note: 🙀 cursor wrote this, need to review it and add tests
+const generateMinePositionsFromSeed = (
+  seed: string,
   width: number,
   height: number,
-  config: Level
-): GameState => ({
-  status: "not-started",
-  flaggedMines: 0,
-  remainingCells: width * height,
-  lastClick: undefined,
-  startTime: undefined,
-  endTime: undefined,
-  config,
-});
+  mines: number
+): Set<string> => {
+  const minePositions = new Set<string>();
 
-export const fillMines = (
-  initialClick: { x: number; y: number },
-  gameBoard: GameBoard,
-  difficulty: Level
-) => {
-  const { x, y } = initialClick;
-  const { width, height, mines } = difficulty;
-
-  // Create a list of all possible positions
+  // Create a deterministic sequence of positions
   const allCells: { x: number; y: number }[] = [];
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
@@ -36,15 +24,38 @@ export const fillMines = (
     }
   }
 
-  // Remove the initial click position and its adjacent cells
-  const safeCells = new Set<string>();
+  // Use a simple hash function to generate deterministic positions
+  let hash = parseInt(seed);
+  while (minePositions.size < mines && allCells.length > 0) {
+    hash = (hash * 31 + 17) % allCells.length;
+    const position = allCells[hash];
+    minePositions.add(`${position.x},${position.y}`);
+    allCells.splice(hash, 1);
+  }
 
-  // Add all 8 adjacent positions
+  return minePositions;
+};
+
+// Helper function to generate random mine positions based on initial click
+const generateRandomMinePositions = (
+  initialClick: { x: number; y: number },
+  width: number,
+  height: number,
+  mines: number
+): Set<string> => {
+  const { x, y } = initialClick;
+  const allCells: { x: number; y: number }[] = [];
+  for (let i = 0; i < height; i++) {
+    for (let j = 0; j < width; j++) {
+      allCells.push({ x: j, y: i });
+    }
+  }
+
+  const safeCells = new Set<string>();
   for (let dy = -1; dy <= 1; dy++) {
     for (let dx = -1; dx <= 1; dx++) {
       const adjX = x + dx;
       const adjY = y + dy;
-      // Skip positions outside the board
       if (adjX >= 0 && adjX < width && adjY >= 0 && adjY < height) {
         safeCells.add(`${adjX},${adjY}`);
       }
@@ -55,13 +66,124 @@ export const fillMines = (
     (pos) => !safeCells.has(`${pos.x},${pos.y}`)
   );
 
-  // Randomly select positions for mines
   const minePositions = new Set<string>();
   while (minePositions.size < mines && availablePositions.length > 0) {
     const randomIndex = Math.floor(Math.random() * availablePositions.length);
     const position = availablePositions[randomIndex];
     minePositions.add(`${position.x},${position.y}`);
     availablePositions.splice(randomIndex, 1);
+  }
+
+  return minePositions;
+};
+
+// Helper function to find the largest connected component of safe cells
+const findLargestSafeArea = (board: GameBoard): { x: number; y: number } => {
+  const width = board[0].length;
+  const height = board.length;
+  const visited = new Set<string>();
+  let largestComponent: { x: number; y: number }[] = [];
+  let currentComponent: { x: number; y: number }[] = [];
+
+  const floodFill = (x: number, y: number) => {
+    const key = `${x},${y}`;
+    if (
+      visited.has(key) ||
+      x < 0 ||
+      x >= width ||
+      y < 0 ||
+      y >= height ||
+      board[y][x].isMine ||
+      board[y][x].adjacentMines !== 0
+    ) {
+      return;
+    }
+
+    visited.add(key);
+    currentComponent.push({ x, y });
+
+    // Check all 8 surrounding cells
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        floodFill(x + dx, y + dy);
+      }
+    }
+  };
+
+  // Find all connected components
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (
+        !visited.has(`${x},${y}`) &&
+        !board[y][x].isMine &&
+        board[y][x].adjacentMines === 0
+      ) {
+        currentComponent = [];
+        floodFill(x, y);
+        if (currentComponent.length > largestComponent.length) {
+          largestComponent = [...currentComponent];
+        }
+      }
+    }
+  }
+
+  // Return the center cell of the largest component
+  if (largestComponent.length > 0) {
+    const centerIndex = Math.floor(largestComponent.length / 2);
+    return largestComponent[centerIndex];
+  }
+
+  // Fallback to first non-mine cell if no safe area found
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!board[y][x].isMine) {
+        return { x, y };
+      }
+    }
+  }
+
+  // This should never happen as there should always be at least one non-mine cell
+  return { x: 0, y: 0 };
+};
+
+export const getInitialGameState = (
+  width: number,
+  height: number,
+  config: Level,
+  seed?: string
+): GameState => ({
+  status: "not-started",
+  flaggedMines: 0,
+  remainingCells: width * height,
+  lastClick: undefined,
+  startTime: undefined,
+  endTime: undefined,
+  config,
+  seed,
+});
+
+export const fillMines = (
+  initialClick: { x: number; y: number },
+  gameBoard: GameBoard,
+  difficulty: Level,
+  seed?: string
+): { board: GameBoard; safeCell: { x: number; y: number } } => {
+  const { width, height, mines } = difficulty;
+
+  let minePositions: Set<string>;
+
+  if (seed) {
+    // For seeded games, ignore initial click and use deterministic positions
+    minePositions = generateMinePositionsFromSeed(seed, width, height, mines);
+  } else {
+    // Generating random mine positions
+    minePositions = generateRandomMinePositions(
+      initialClick,
+      width,
+      height,
+      mines
+    );
   }
 
   // Create a new board with mines
@@ -103,7 +225,16 @@ export const fillMines = (
     }
   });
 
-  return boardWithAdjacentMines;
+  // Find the largest safe area if using a seed
+  let safeCell = initialClick;
+  if (seed) {
+    safeCell = findLargestSafeArea(boardWithAdjacentMines);
+  }
+
+  return {
+    board: boardWithAdjacentMines,
+    safeCell,
+  };
 };
 
 export const revealCells = (
@@ -119,13 +250,23 @@ export const revealCells = (
   const height = gameBoard.length;
 
   if (gameState.status === "not-started") {
-    const initialBoard = fillMines(cell, gameBoard, gameState.config);
+    const { board: initialBoard, safeCell } = fillMines(
+      cell,
+      gameBoard,
+      gameState.config,
+      gameState.seed
+    );
     const startGameState = {
       ...gameState,
       status: "in-progress" as const,
       startTime: Date.now(),
     };
-    return revealCells(cell, initialBoard, startGameState);
+    // Use the safe cell if we have a seed, otherwise use the initial click
+    return revealCells(
+      gameState.seed ? safeCell : cell,
+      initialBoard,
+      startGameState
+    );
   }
 
   if (gameBoard[y][x].isMine) {

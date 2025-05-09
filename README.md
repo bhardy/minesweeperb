@@ -19,6 +19,11 @@
 - [ ] mobile styles -- lock the chrome to the viewport
 - [ ] reveal state after a loss should show incorrect flags
 - [ ] update all colors in .minesweeper to use css custom properties
+- [x] add seeded mode
+- [ ] seeded mode should account for difficulty
+- [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
+- [ ] supply seed when game complete
+- [ ] only update high score for non-seeded rounds
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

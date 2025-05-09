@@ -17,6 +17,7 @@ interface NewBestTimeProps {
   onSubmit: (name: string) => void;
   time: number;
   difficulty: string;
+  seed?: string;
 }
 
 export const NewBestTime = ({
@@ -25,6 +26,7 @@ export const NewBestTime = ({
   onSubmit,
   time,
   difficulty,
+  seed,
 }: NewBestTimeProps) => {
   const [name, setName] = useLocalStorage(LATEST_USERNAME_KEY, "");
 
@@ -39,35 +41,50 @@ export const NewBestTime = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle>New Best Time!</DialogTitle>
+          <DialogTitle>{seed ? "You Won!" : "New Best Time!"}</DialogTitle>
         </DialogHeader>
-        <p className="mb-2">
-          You completed {difficulty} difficulty in {time} seconds!
-        </p>
-        <form onSubmit={handleSubmit}>
-          <Label htmlFor="user-name" className="mb-2">
-            Your name
-          </Label>
-          <Input
-            id="user-name"
-            type="text"
-            placeholder="Enter your name"
-            value={name ?? ""}
-            onChange={(e) => setName(e.target.value.slice(0, 15))}
-            maxLength={15}
-            className="mb-4"
-            autoFocus
-            autoComplete="off"
-          />
-          <DialogFooter>
-            <Button onClick={onClose} variant="outline">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={!name?.trim()}>
-              Save
-            </Button>
-          </DialogFooter>
-        </form>
+        {seed ? (
+          <>
+            <p>
+              You completed seed <b>{seed}</b> on <b>{difficulty}</b> difficulty{" "}
+              in <b>{time}</b> seconds!
+            </p>
+            <p className="text-gray-500 text-sm text-center">
+              Best times from seeded rounds are not saved
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="mb-2">
+              You completed <b>{difficulty}</b> difficulty in <b>{time}</b>{" "}
+              seconds!
+            </p>
+            <form onSubmit={handleSubmit}>
+              <Label htmlFor="user-name" className="mb-2">
+                Your name
+              </Label>
+              <Input
+                id="user-name"
+                type="text"
+                placeholder="Enter your name"
+                value={name ?? ""}
+                onChange={(e) => setName(e.target.value.slice(0, 15))}
+                maxLength={15}
+                className="mb-4"
+                autoFocus
+                autoComplete="off"
+              />
+              <DialogFooter>
+                <Button onClick={onClose} variant="outline">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={!name?.trim()}>
+                  Save
+                </Button>
+              </DialogFooter>
+            </form>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
