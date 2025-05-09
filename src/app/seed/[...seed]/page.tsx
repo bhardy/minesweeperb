@@ -13,7 +13,7 @@ export default async function Seed({ params }: Props) {
   return (
     <main className="min-h-screen font-[family-name:var(--font-geist-sans)]">
       <Suspense>
-        <Minesweeper seed={seed} />
+        <Minesweeper seed={seed[0]} />
       </Suspense>
     </main>
   );

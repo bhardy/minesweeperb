@@ -24,8 +24,16 @@ const generateMinePositionsFromSeed = (
     }
   }
 
-  // Use a simple hash function to generate deterministic positions
-  let hash = parseInt(seed);
+  // Convert seed string to a numeric hash
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  // Ensure hash is positive
+  hash = Math.abs(hash);
+
   while (minePositions.size < mines && allCells.length > 0) {
     hash = (hash * 31 + 17) % allCells.length;
     const position = allCells[hash];
