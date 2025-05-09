@@ -22,6 +22,7 @@ export interface GameState {
   startTime?: number;
   endTime?: number;
   config: Level;
+  seed?: string;
 }
 
 export interface BestTime {

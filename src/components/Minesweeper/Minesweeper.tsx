@@ -20,7 +20,7 @@ import {
   saveBestTime,
 } from "./game";
 
-export const Minesweeper = () => {
+export const Minesweeper = ({ seed }: { seed?: string }) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(0);
@@ -30,7 +30,8 @@ export const Minesweeper = () => {
     getInitialGameState(
       currentConfig.width,
       currentConfig.height,
-      currentConfig
+      currentConfig,
+      seed
     )
   );
 
@@ -63,10 +64,11 @@ export const Minesweeper = () => {
       getInitialGameState(
         currentConfig.width,
         currentConfig.height,
-        currentConfig
+        currentConfig,
+        seed
       )
     );
-  }, [currentConfig]);
+  }, [currentConfig, seed]);
 
   // Reset the game board when difficulty changes
   useEffect(() => {
@@ -111,6 +113,7 @@ export const Minesweeper = () => {
     }));
   };
 
+  // @todo: this needs to be updated as NewBestTime is shared for seed and non-seeded games
   const handleGameWin = useCallback(
     (time: number) => {
       const difficulty = currentConfig.name;
@@ -118,8 +121,12 @@ export const Minesweeper = () => {
         setWinTime(time);
         setShowBestTimeDialog(true);
       }
+      if (seed) {
+        setWinTime(time);
+        setShowBestTimeDialog(true);
+      }
     },
-    [currentConfig.name]
+    [currentConfig.name, seed]
   );
 
   useEffect(() => {
@@ -196,6 +203,7 @@ export const Minesweeper = () => {
         onSubmit={handleBestTimeSubmit}
         time={winTime || 0}
         difficulty={currentConfig.name}
+        seed={seed}
       />
     </div>
   );
