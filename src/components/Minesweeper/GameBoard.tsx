@@ -27,10 +27,7 @@ const Cell = ({
   const { ...pressHandlerProps } = usePressHandler({
     onClick: () => onPrimaryAction(x, y),
     onHold: () => onSecondaryAction(x, y),
-    onRightClick: () => {
-      console.log("right click");
-      onSecondaryAction(x, y);
-    },
+    onRightClick: () => onSecondaryAction(x, y),
   });
 
   const isLastClick = lastClick?.x === x && lastClick?.y === y;
