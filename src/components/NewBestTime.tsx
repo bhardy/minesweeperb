@@ -14,6 +14,7 @@ import useLocalStorage from "use-local-storage";
 interface NewBestTimeProps {
   isOpen: boolean;
   onSubmit: (name: string) => void;
+  onClose: () => void;
   time: number;
   difficulty: string;
   seed?: string;
@@ -22,6 +23,7 @@ interface NewBestTimeProps {
 export const NewBestTime = ({
   isOpen,
   onSubmit,
+  onClose,
   time,
   difficulty,
   seed,
@@ -36,11 +38,8 @@ export const NewBestTime = ({
   };
 
   return (
-    <Dialog open={isOpen}>
-      <DialogContent
-        onPointerDownOutside={(e) => e.preventDefault()}
-        hideCloseButton
-      >
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{seed ? "You Won!" : "New Best Time!"}</DialogTitle>
         </DialogHeader>
@@ -58,7 +57,7 @@ export const NewBestTime = ({
           )}
         </DialogDescription>
         {seed ? (
-          <p className="text-gray-500 text-sm text-center">
+          <p className="text-gray-500 text-sm">
             Best times from seeded rounds are not saved
           </p>
         ) : (

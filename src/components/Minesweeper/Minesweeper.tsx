@@ -113,17 +113,16 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
   const handleGameWin = useCallback(
     (time: number) => {
       const difficulty = currentConfig.name;
-      console.log("handleGameWin");
-      if (isNewBestTime(difficulty, time) && !showBestTimeDialog) {
+      if (isNewBestTime(difficulty, time)) {
         setWinTime(time);
         setShowBestTimeDialog(true);
       }
-      if (seed && !showBestTimeDialog) {
+      if (seed) {
         setWinTime(time);
         setShowBestTimeDialog(true);
       }
     },
-    [currentConfig.name, seed, showBestTimeDialog]
+    [currentConfig.name, seed]
   );
 
   useEffect(() => {
@@ -200,6 +199,7 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
       )}
       <NewBestTime
         isOpen={showBestTimeDialog}
+        onClose={() => setShowBestTimeDialog(false)}
         onSubmit={handleBestTimeSubmit}
         time={winTime || 0}
         difficulty={currentConfig.name}

@@ -257,6 +257,14 @@ export const revealCells = (
   const width = gameBoard[0].length;
   const height = gameBoard.length;
 
+  // todo, maybe this should be handled higher up?
+  if (gameState.status === "lost") {
+    return {
+      gameBoard,
+      gameState,
+    };
+  }
+
   if (gameState.status === "not-started") {
     const { board: initialBoard, safeCell } = fillMines(
       cell,
