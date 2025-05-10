@@ -12,23 +12,29 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import type { Level } from "@/types/minesweeper";
-import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import { RecordsDialog } from "./RecordsDialog";
+import { SettingsDialog } from "./SettingsDialog";
 
 interface OptionsProps {
   difficultyLevels: Level[];
   currentDifficulty: number;
   setDifficulty: (difficulty: number) => void;
+  holdToFlag: boolean;
+  onHoldToFlagChange: (enabled: boolean) => void;
 }
 
 export function Options({
   difficultyLevels,
   currentDifficulty,
   setDifficulty,
+  holdToFlag,
+  onHoldToFlagChange,
 }: OptionsProps) {
   const [recordsOpen, setRecordsOpen] = React.useState(false);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
 
   return (
     <>
@@ -60,11 +66,22 @@ export function Options({
             <DropdownMenuItem onSelect={() => setRecordsOpen(true)}>
               View Best Times
             </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
+              Settings
+            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       {recordsOpen && (
         <RecordsDialog isOpen={true} onClose={() => setRecordsOpen(false)} />
+      )}
+      {settingsOpen && (
+        <SettingsDialog
+          isOpen={true}
+          onClose={() => setSettingsOpen(false)}
+          holdToFlag={holdToFlag}
+          onHoldToFlagChange={onHoldToFlagChange}
+        />
       )}
     </>
   );

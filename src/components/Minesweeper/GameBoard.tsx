@@ -14,6 +14,7 @@ interface CellProps {
   onPrimaryAction: (x: number, y: number) => void;
   onSecondaryAction: (x: number, y: number) => void;
   lastClick?: { x: number; y: number };
+  holdToFlag: boolean;
 }
 
 const Cell = ({
@@ -23,10 +24,11 @@ const Cell = ({
   onPrimaryAction,
   onSecondaryAction,
   lastClick,
+  holdToFlag,
 }: CellProps) => {
   const { ...pressHandlerProps } = usePressHandler({
     onClick: () => onPrimaryAction(x, y),
-    onHold: () => onSecondaryAction(x, y),
+    onHold: holdToFlag ? () => onSecondaryAction(x, y) : undefined,
     onRightClick: () => onSecondaryAction(x, y),
   });
 
@@ -66,6 +68,7 @@ interface GameBoardProps {
   gameState: GameState;
   onPrimaryAction: (x: number, y: number) => void;
   onSecondaryAction: (x: number, y: number) => void;
+  holdToFlag: boolean;
 }
 
 export const GameBoard = ({
@@ -73,6 +76,7 @@ export const GameBoard = ({
   gameState,
   onPrimaryAction,
   onSecondaryAction,
+  holdToFlag,
 }: GameBoardProps) => {
   return (
     <div
@@ -96,6 +100,7 @@ export const GameBoard = ({
                 onPrimaryAction={onPrimaryAction}
                 onSecondaryAction={onSecondaryAction}
                 lastClick={gameState.lastClick}
+                holdToFlag={holdToFlag}
               />
             ))}
           </div>

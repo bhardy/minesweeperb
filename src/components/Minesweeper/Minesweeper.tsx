@@ -19,11 +19,13 @@ import {
   isNewBestTime,
   saveBestTime,
 } from "./game";
+import useLocalStorage from "use-local-storage";
 
 export const Minesweeper = ({ seed }: { seed?: string }) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(0);
+  const [holdToFlag, setHoldToFlag] = useLocalStorage("holdToFlag", true);
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
   const [gameState, setGameState] = useState<GameState>(() =>
@@ -155,6 +157,8 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
           difficultyLevels={DIFFICULTY_LEVELS}
           currentDifficulty={difficulty}
           setDifficulty={setDifficulty}
+          holdToFlag={holdToFlag}
+          onHoldToFlagChange={setHoldToFlag}
         />
       </div>
       <div
@@ -183,6 +187,7 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
         gameState={gameState}
         onPrimaryAction={handlePrimaryAction}
         onSecondaryAction={handleSecondaryAction}
+        holdToFlag={holdToFlag}
       />
       {isDebug && (
         <pre
