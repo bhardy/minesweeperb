@@ -56,11 +56,7 @@ export const NewBestTime = ({
             </span>
           )}
         </DialogDescription>
-        {seed ? (
-          <p className="text-gray-500 text-sm">
-            Best times from seeded rounds are not saved
-          </p>
-        ) : (
+        {!seed && (
           <form onSubmit={handleSubmit} className="mt-2">
             <div className="flex items-end gap-2">
               <div className="flex-1">

@@ -21,7 +21,13 @@ import {
 } from "./game";
 import useLocalStorage from "use-local-storage";
 
-export const Minesweeper = ({ seed }: { seed?: string }) => {
+export const Minesweeper = ({
+  seed,
+  onGameEnd,
+}: {
+  seed?: string;
+  onGameEnd?: (status: "won" | "lost") => void;
+}) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(0);
@@ -88,6 +94,7 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
   };
 
   const handleSecondaryAction = (x: number, y: number) => {
+    if (gameState.status === "won") return;
     if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
 
     const newBoard = gameBoard.map((row, rowIndex) =>
@@ -149,6 +156,12 @@ export const Minesweeper = ({ seed }: { seed?: string }) => {
   useEffect(() => {
     resetGame();
   }, [difficulty, resetGame]);
+
+  useEffect(() => {
+    if (gameState.status === "won" || gameState.status === "lost") {
+      onGameEnd?.(gameState.status);
+    }
+  }, [gameState.status, onGameEnd]);
 
   return (
     <div className={styles.minesweeper}>
