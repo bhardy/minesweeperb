@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import type { Level } from "@/types/minesweeper";
 import { RecordsDialog } from "./RecordsDialog";
 import { SettingsDialog } from "./SettingsDialog";
+import { ArchiveDialog } from "./DailyChallenge/ArchiveDialog";
 
 interface OptionsProps {
   difficultyLevels: Level[];
@@ -35,6 +42,8 @@ export function Options({
 }: OptionsProps) {
   const [recordsOpen, setRecordsOpen] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [archiveOpen, setArchiveOpen] = React.useState(false);
+  const router = useRouter();
 
   return (
     <>
@@ -70,6 +79,26 @@ export function Options({
               Settings
             </DropdownMenuItem>
           </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Daily Challenge</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    router.push(
+                      `/daily/${format(new Date(), "MMMM-d-yy").toLowerCase()}`
+                    )
+                  }
+                >
+                  Today&apos;s Challenge
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
+                  View Archive
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
       {recordsOpen && (
@@ -82,6 +111,9 @@ export function Options({
           holdToFlag={holdToFlag}
           onHoldToFlagChange={onHoldToFlagChange}
         />
+      )}
+      {archiveOpen && (
+        <ArchiveDialog isOpen={true} onClose={() => setArchiveOpen(false)} />
       )}
     </>
   );
