@@ -24,13 +24,15 @@ import useLocalStorage from "use-local-storage";
 export const Minesweeper = ({
   seed,
   onGameEnd,
+  initialDifficulty,
 }: {
   seed?: string;
-  onGameEnd?: (status: "won" | "lost") => void;
+  onGameEnd?: (gameState: GameState) => void;
+  initialDifficulty?: number;
 }) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
-  const [difficulty, setDifficulty] = useState<number>(0);
+  const [difficulty, setDifficulty] = useState<number>(initialDifficulty ?? 0);
   const [holdToFlag, setHoldToFlag] = useLocalStorage("holdToFlag", true);
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
@@ -159,9 +161,9 @@ export const Minesweeper = ({
 
   useEffect(() => {
     if (gameState.status === "won" || gameState.status === "lost") {
-      onGameEnd?.(gameState.status);
+      onGameEnd?.(gameState);
     }
-  }, [gameState.status, onGameEnd]);
+  }, [gameState, onGameEnd]);
 
   return (
     <div className={styles.minesweeper}>

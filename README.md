@@ -26,7 +26,7 @@
 - [x] only update high score for non-seeded rounds
 - [ ] re-enable dismissing the new best time dialog
 - [ ] add daily challenge mode, using seeds
-- [ ] the win state should be composable (NewBestTime will become very gross very fast)
+- [ ] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
