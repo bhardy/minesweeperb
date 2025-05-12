@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -16,10 +17,23 @@ import {
   isToday,
   startOfWeek,
   endOfWeek,
+  isAfter,
+  startOfDay,
 } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import classNames from "classnames";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-type GameResult = "won" | "lost" | null;
+type GameResult = {
+  status: "won" | "lost" | "won-retry";
+  time?: number;
+} | null;
 
 interface ArchiveDialogProps {
   isOpen: boolean;
@@ -31,14 +45,30 @@ export const ArchiveDialog = ({ isOpen, onClose }: ArchiveDialogProps) => {
   const [gameResults, setGameResults] = useState<Record<string, GameResult>>(
     {}
   );
+  const [difficulty, setDifficulty] = useState("beginner");
   const router = useRouter();
+  const params = useParams();
 
   useEffect(() => {
     const storedResults = localStorage.getItem("dailyChallengeResults");
     if (storedResults) {
-      setGameResults(JSON.parse(storedResults));
+      const results = JSON.parse(storedResults);
+      // Get the results for the current difficulty
+      const difficultyResults = results[difficulty] || {};
+      setGameResults(difficultyResults);
     }
-  }, []);
+  }, [difficulty]);
+
+  useEffect(() => {
+    // Get difficulty from route params
+    const pathDifficulty = params?.difficulty as string;
+    if (
+      pathDifficulty &&
+      ["beginner", "intermediate", "expert"].includes(pathDifficulty)
+    ) {
+      setDifficulty(pathDifficulty);
+    }
+  }, [params]);
 
   const days = eachDayOfInterval({
     start: startOfWeek(startOfMonth(currentMonth)),
@@ -59,7 +89,7 @@ export const ArchiveDialog = ({ isOpen, onClose }: ArchiveDialogProps) => {
 
   const handleDayClick = (date: Date) => {
     const formattedDate = format(date, "MMMM-d-yy").toLowerCase();
-    router.push(`/daily/${formattedDate}`);
+    router.push(`/daily/${formattedDate}/${difficulty}`);
     onClose();
   };
 
@@ -76,7 +106,22 @@ export const ArchiveDialog = ({ isOpen, onClose }: ArchiveDialogProps) => {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Complete daily challenges on beginner, intermediate, and expert.
+          </DialogDescription>
         </DialogHeader>
+
+        <Select value={difficulty} onValueChange={setDifficulty}>
+          <SelectTrigger className="w-full mb-4">
+            <SelectValue placeholder="Select difficulty" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="beginner">Beginner</SelectItem>
+            <SelectItem value="intermediate">Intermediate</SelectItem>
+            <SelectItem value="expert">Expert</SelectItem>
+          </SelectContent>
+        </Select>
+
         <div className="grid grid-cols-7 gap-1">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div key={day} className="text-center text-sm font-medium">
@@ -88,23 +133,30 @@ export const ArchiveDialog = ({ isOpen, onClose }: ArchiveDialogProps) => {
             const result = gameResults[formattedDate];
             const isCurrentMonth = isSameMonth(day, currentMonth);
             const isCurrentDay = isToday(day);
+            const isFutureDate = isAfter(
+              startOfDay(day),
+              startOfDay(new Date())
+            );
 
             return (
               <button
                 key={day.toISOString()}
                 onClick={() => handleDayClick(day)}
-                className={`
-                  aspect-square p-1 text-sm
-                  ${!isCurrentMonth ? "opacity-50" : ""}
-                  ${isCurrentDay ? "ring-2 ring-primary" : ""}
-                  ${
-                    result === "won"
-                      ? "bg-green-100 hover:bg-green-200"
-                      : result === "lost"
-                      ? "bg-red-100 hover:bg-red-200"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }
-                `}
+                disabled={isFutureDate}
+                className={classNames("aspect-square p-1 text-sm color-white", {
+                  "opacity-50": !isCurrentMonth,
+                  "border-2 border-primary": isCurrentDay,
+                  "bg-green-500 hover:bg-green-600": result?.status === "won",
+                  "bg-blue-500 hover:bg-blue-600":
+                    result?.status === "won-retry",
+                  "bg-red-500 hover:bg-red-600": result?.status === "lost",
+                  "text-white":
+                    result?.status === "won" ||
+                    result?.status === "lost" ||
+                    result?.status === "won-retry",
+                  "bg-gray-100 hover:bg-gray-200": !result,
+                  "cursor-not-allowed opacity-30": isFutureDate,
+                })}
               >
                 {format(day, "d")}
               </button>

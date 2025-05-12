@@ -1,5 +1,5 @@
-import { DailyGame } from "@/components/DailyChallenge/DailyGame";
-import { Suspense } from "react";
+import { use } from "react";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -7,16 +7,7 @@ type Props = {
   }>;
 };
 
-export default async function Date({ params }: Props) {
-  const { date } = await params;
-
-  console.log(date);
-
-  return (
-    <main className="min-h-screen font-[family-name:var(--font-geist-sans)]">
-      <Suspense>
-        <DailyGame date={date} />
-      </Suspense>
-    </main>
-  );
+export default function DateRedirect({ params }: Props) {
+  const { date } = use(params);
+  redirect(`/daily/${date}/beginner`);
 }
