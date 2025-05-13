@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import useLocalStorage from "use-local-storage";
 
 type GameResult = {
   status: "won" | "lost" | "won-retry";
@@ -42,22 +43,21 @@ interface ArchiveDialogProps {
 
 export const ArchiveDialog = ({ isOpen, onClose }: ArchiveDialogProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [difficulty, setDifficulty] = useState("beginner");
+  const [storedResults] = useLocalStorage<
+    Record<string, Record<string, GameResult>>
+  >("dailyChallengeResults", {});
   const [gameResults, setGameResults] = useState<Record<string, GameResult>>(
     {}
   );
-  const [difficulty, setDifficulty] = useState("beginner");
   const router = useRouter();
   const params = useParams();
 
   useEffect(() => {
-    const storedResults = localStorage.getItem("dailyChallengeResults");
-    if (storedResults) {
-      const results = JSON.parse(storedResults);
-      // Get the results for the current difficulty
-      const difficultyResults = results[difficulty] || {};
-      setGameResults(difficultyResults);
-    }
-  }, [difficulty]);
+    // Get the results for the current difficulty
+    const difficultyResults = storedResults[difficulty] || {};
+    setGameResults(difficultyResults);
+  }, [difficulty, storedResults]);
 
   useEffect(() => {
     // Get difficulty from route params

@@ -36,8 +36,9 @@ export const DayResult = ({ results, date }: DayResultProps) => {
               <span className="capitalize font-semibold mb-2">
                 {difficulty}
               </span>
-              {result?.status === "won" ||
-                (result?.status === "won-retry" && <span>{result.time}s</span>)}
+              {(result?.status === "won" || result?.status === "won-retry") && (
+                <span>{result.time}s</span>
+              )}
               {result?.status === "lost" && <span>Retry</span>}
               {!result && <span>Play</span>}
             </Link>
