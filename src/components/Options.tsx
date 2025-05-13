@@ -56,16 +56,15 @@ export function Options({
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="rounded-none p-2 text-xs"
+            className="block text-xs p-0 h-auto cursor-pointer first-letter:underline hover:bg-transparent hover:underline"
           >
             Game
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-48">
           <DropdownMenuLabel>Select Difficulty</DropdownMenuLabel>
-          {/* <DropdownMenuSeparator /> */}
           <DropdownMenuRadioGroup
             value={currentDifficulty.toString()}
             onValueChange={(value) => setDifficulty(parseInt(value))}
@@ -97,20 +96,24 @@ export function Options({
             ))}
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Daily Status</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onSelect={() => setDailyStatusOpen(true)}>
-                  Challenges for {format(new Date(), "MMMM do")}
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
-                  Daily Challenge Archive
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuSeparator />
+          {currentGameMode === "daily" && (
+            <>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Daily Status</DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onSelect={() => setDailyStatusOpen(true)}>
+                      Challenges for {format(new Date(), "MMMM do")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
+                      Daily Challenge Archive
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuGroup>
             {currentGameMode === "classic" && (
               <DropdownMenuItem onSelect={() => setRecordsOpen(true)}>

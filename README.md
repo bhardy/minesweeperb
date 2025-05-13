@@ -30,6 +30,7 @@
 - [x] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
 - [ ] determine if all menu options should be in the game dropdown or if they should be elsewhere. right now challenges are route based (including difficulty) so the select difficulty drop down is a bit weird. it could be updated so they can be overridden to transition routes
 - [ ] add expanded mode -- mostly for mobile
+- [ ] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

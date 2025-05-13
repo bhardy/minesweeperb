@@ -42,13 +42,13 @@ export const RecordsDialog = ({ isOpen, onClose }: RecordsDialogProps) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Best Times</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="sr-only">
             Your best times for each difficulty
           </DialogDescription>
         </DialogHeader>
         <div className="py-2">
           {Object.entries(bestTimes).length === 0 ? (
-            <p className="text-sm text-muted-foreground">No records yet.</p>
+            <p className="text-sm text-muted-foreground ">No records yet.</p>
           ) : (
             <div className="space-y-4">
               {Object.entries(bestTimes).map(([difficulty, record]) => (
