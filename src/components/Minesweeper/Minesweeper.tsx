@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import styles from "./minesweeper.module.css";
@@ -25,10 +25,19 @@ export const Minesweeper = ({
   seed,
   onGameEnd,
   initialDifficulty,
+  WinDialog,
 }: {
   seed?: string;
   onGameEnd?: (gameState: GameState) => void;
   initialDifficulty?: number;
+  WinDialog?: React.ComponentType<{
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (name: string) => void;
+    time: number;
+    difficulty: string;
+    seed?: string;
+  }>;
 }) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
@@ -58,6 +67,8 @@ export const Minesweeper = ({
 
   const [showBestTimeDialog, setShowBestTimeDialog] = useState(false);
   const [winTime, setWinTime] = useState<number | null>(null);
+
+  const prevGameStateRef = useRef<GameState | undefined>(undefined);
 
   const resetGame = useCallback(() => {
     setGameBoard(
@@ -160,9 +171,13 @@ export const Minesweeper = ({
   }, [difficulty, resetGame]);
 
   useEffect(() => {
-    if (gameState.status === "won" || gameState.status === "lost") {
+    if (
+      (gameState.status === "won" || gameState.status === "lost") &&
+      prevGameStateRef.current?.status !== gameState.status
+    ) {
       onGameEnd?.(gameState);
     }
+    prevGameStateRef.current = gameState;
   }, [gameState, onGameEnd]);
 
   return (
@@ -217,14 +232,25 @@ export const Minesweeper = ({
           {JSON.stringify(gameState, null, 2)}
         </pre>
       )}
-      <NewBestTime
-        isOpen={showBestTimeDialog}
-        onClose={() => setShowBestTimeDialog(false)}
-        onSubmit={handleBestTimeSubmit}
-        time={winTime || 0}
-        difficulty={currentConfig.name}
-        seed={seed}
-      />
+      {WinDialog ? (
+        <WinDialog
+          isOpen={showBestTimeDialog}
+          onClose={() => setShowBestTimeDialog(false)}
+          onSubmit={handleBestTimeSubmit}
+          time={winTime || 0}
+          difficulty={currentConfig.name}
+          seed={seed}
+        />
+      ) : (
+        <NewBestTime
+          isOpen={showBestTimeDialog}
+          onClose={() => setShowBestTimeDialog(false)}
+          onSubmit={handleBestTimeSubmit}
+          time={winTime || 0}
+          difficulty={currentConfig.name}
+          seed={seed}
+        />
+      )}
     </div>
   );
 };

@@ -2,7 +2,7 @@
 
 - [x] reveal state after loss needs to show clicked bomb and not show the adjacent cells
 - [x] better event handling for clicking for mobile
-- [ ] quick reveal mode
+- [ ] quick reveal mode (chording)
 - [x] color adjacent counts
 - [x] store best time for each difficulty
 - [x] disable clicking on flagged items
@@ -20,13 +20,15 @@
 - [ ] reveal state after a loss should show incorrect flags
 - [ ] update all colors in .minesweeper to use css custom properties
 - [x] add seeded mode
-- [ ] seeded mode should account for difficulty
 - [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
-- [ ] supply seed when game complete
+- [ ] supply seed (& link) when game complete
+- [ ] add difficulty tier to seed route
 - [x] only update high score for non-seeded rounds
-- [ ] re-enable dismissing the new best time dialog
+- [x] re-enable dismissing the new best time dialog
 - [ ] add daily challenge mode, using seeds
-- [ ] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
+- [x] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
+- [ ] determine if all menu options should be in the game dropdown or if they should be elsewhere. right now challenges are route based (including difficulty) so the select difficulty drop down is a bit weird. it could be updated so they can be overridden to transition routes
+- [ ] add expanded mode -- mostly for mobile
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

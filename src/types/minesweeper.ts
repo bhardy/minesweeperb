@@ -30,3 +30,18 @@ export interface BestTime {
   time: number;
   date: string;
 }
+
+export type DailyResults = {
+  [key: string]: {
+    status?: "won" | "lost" | "won-retry";
+    time?: number;
+  };
+};
+
+export type AllResults = {
+  beginner: DailyResults;
+  intermediate: DailyResults;
+  expert: DailyResults;
+};
+
+export type DifficultyKey = keyof AllResults;

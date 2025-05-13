@@ -1,24 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Minesweeper } from "@/components/Minesweeper/Minesweeper";
 import { format, parse } from "date-fns";
 import { DIFFICULTY_LEVELS } from "@/types/constants";
-import type { GameState } from "@/types/minesweeper";
+import type { GameState, AllResults, DifficultyKey } from "@/types/minesweeper";
 import useLocalStorage from "use-local-storage";
-import { useEffect, useState } from "react";
-
-type DailyResults = {
-  [key: string]: {
-    status?: "won" | "lost" | "won-retry";
-    time?: number;
-  };
-};
-
-type DifficultyKey = "beginner" | "intermediate" | "expert";
-
-type AllResults = {
-  [key in DifficultyKey]: DailyResults;
-};
+import { ChallengeComplete } from "./ChallengeComplete";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DayResult } from "./DayResult";
 
 export function DailyGame({
   date,
@@ -28,8 +25,8 @@ export function DailyGame({
   difficulty: string;
 }) {
   const [isClient, setIsClient] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const dateObj = parse(date, "MMMM-d-yy", new Date());
-  const seed = format(dateObj, "yyyy-MM-dd");
   const difficultyIndex = DIFFICULTY_LEVELS.findIndex(
     (level) => level.name === difficulty
   );
@@ -86,22 +83,30 @@ export function DailyGame({
           Daily Challenge: {format(dateObj, "MMMM d, yyyy")} ({difficulty})
         </h1>
 
-        {isClient && existingResults?.status === "won" && (
-          <h2 className="text-sm">
-            Completed in {existingResults.time} seconds (first try)
-          </h2>
-        )}
-        {isClient && existingResults?.status === "won-retry" && (
-          <h2 className="text-sm">
-            Completed in {existingResults.time} seconds (on retry)
-          </h2>
+        {isClient && existingResults?.status && (
+          <Button variant="outline" onClick={() => setShowResults(true)}>
+            View Results
+          </Button>
         )}
       </div>
 
+      <Dialog open={showResults} onOpenChange={setShowResults}>
+        <DialogContent className="sm:max-w-[360px]">
+          <DialogHeader>
+            <DialogTitle>{format(dateObj, "MMMM d, yyyy")}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="sr-only">
+            Results for {format(dateObj, "MMMM d, yyyy")}
+          </DialogDescription>
+          <DayResult results={results} date={date} />
+        </DialogContent>
+      </Dialog>
+
       <Minesweeper
-        seed={seed}
+        seed={date}
         onGameEnd={handleGameEnd}
         initialDifficulty={difficultyIndex}
+        WinDialog={ChallengeComplete}
       />
     </>
   );
