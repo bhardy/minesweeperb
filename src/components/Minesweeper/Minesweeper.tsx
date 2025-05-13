@@ -18,6 +18,7 @@ import {
   revealCells,
   isNewBestTime,
   saveBestTime,
+  chordClick,
 } from "./game";
 import useLocalStorage from "use-local-storage";
 
@@ -108,7 +109,18 @@ export const Minesweeper = ({
 
   const handleSecondaryAction = (x: number, y: number) => {
     if (gameState.status === "won") return;
-    if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
+    // if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
+    if (gameBoard[y][x].isRevealed) {
+      const { gameBoard: nextGameBoard, gameState: nextGameState } = chordClick(
+        { x, y },
+        gameBoard,
+        gameState
+      );
+
+      setGameBoard(nextGameBoard);
+      setGameState(nextGameState);
+      return;
+    }
 
     const newBoard = gameBoard.map((row, rowIndex) =>
       row.map((cell, colIndex) =>

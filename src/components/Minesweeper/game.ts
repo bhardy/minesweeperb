@@ -379,6 +379,98 @@ export const revealCells = (
   };
 };
 
+export const chordClick = (
+  cell: { x: number; y: number },
+  gameBoard: GameBoard,
+  gameState: GameState
+) => {
+  const { x, y } = cell;
+  const width = gameBoard[0].length;
+  const height = gameBoard.length;
+
+  // 1. Check if cell is already revealed
+  if (!gameBoard[y][x].isRevealed) {
+    return { gameBoard, gameState };
+  }
+
+  // 2. Check if cell has adjacent mines
+  if (gameBoard[y][x].adjacentMines === 0) {
+    return { gameBoard, gameState };
+  }
+
+  // 3. Count adjacent flagged cells
+  let flaggedCount = 0;
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const newX = x + dx;
+      const newY = y + dy;
+
+      // Skip current cell and check bounds
+      if (
+        (dx === 0 && dy === 0) ||
+        newX < 0 ||
+        newX >= width ||
+        newY < 0 ||
+        newY >= height
+      ) {
+        continue;
+      }
+
+      if (gameBoard[newY][newX].isFlagged) {
+        flaggedCount++;
+      }
+    }
+  }
+
+  // Check if flagged count matches adjacent mines
+  if (flaggedCount !== gameBoard[y][x].adjacentMines) {
+    return { gameBoard, gameState };
+  }
+
+  // 4. Get list of adjacent cells that aren't flagged or revealed
+  const cellsToReveal: { x: number; y: number }[] = [];
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const newX = x + dx;
+      const newY = y + dy;
+
+      // Skip current cell and check bounds
+      if (
+        (dx === 0 && dy === 0) ||
+        newX < 0 ||
+        newX >= width ||
+        newY < 0 ||
+        newY >= height
+      ) {
+        continue;
+      }
+
+      if (
+        !gameBoard[newY][newX].isFlagged &&
+        !gameBoard[newY][newX].isRevealed
+      ) {
+        cellsToReveal.push({ x: newX, y: newY });
+      }
+    }
+  }
+
+  // 5. Reveal each cell
+  let newBoard = gameBoard;
+  let newGameState = gameState;
+  for (const cell of cellsToReveal) {
+    const result = revealCells(cell, newBoard, newGameState);
+    newBoard = result.gameBoard;
+    newGameState = result.gameState;
+
+    // Stop if game is over
+    if (newGameState.status === "lost" || newGameState.status === "won") {
+      break;
+    }
+  }
+
+  return { gameBoard: newBoard, gameState: newGameState };
+};
+
 export const getBestTimes = (): Record<string, BestTime> => {
   const times = localStorage.getItem(BEST_TIMES_KEY);
   return times ? JSON.parse(times) : {};
