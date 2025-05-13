@@ -18,6 +18,7 @@
 - [x] improve UX on clicking quick -- currently some clicks are being lost
 - [ ] mobile styles -- lock the chrome to the viewport
 - [ ] reveal state after a loss should show incorrect flags
+- [ ] reveal state after a loss shouldn't show bombs in cells with correct flags
 - [ ] update all colors in .minesweeper to use css custom properties
 - [x] add seeded mode
 - [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
@@ -25,7 +26,7 @@
 - [ ] add difficulty tier to seed route
 - [x] only update high score for non-seeded rounds
 - [x] re-enable dismissing the new best time dialog
-- [ ] add daily challenge mode, using seeds
+- [x] add daily challenge mode, using seeds
 - [x] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
 - [ ] determine if all menu options should be in the game dropdown or if they should be elsewhere. right now challenges are route based (including difficulty) so the select difficulty drop down is a bit weird. it could be updated so they can be overridden to transition routes
 - [ ] add expanded mode -- mostly for mobile

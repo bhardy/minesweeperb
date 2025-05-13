@@ -23,3 +23,14 @@ export const DIFFICULTY_LEVELS: Level[] = [
     mines: 99,
   },
 ];
+
+export const GAME_MODES = [
+  {
+    name: "Classic",
+    value: "classic",
+  },
+  {
+    name: "Daily Challenge",
+    value: "daily",
+  },
+];

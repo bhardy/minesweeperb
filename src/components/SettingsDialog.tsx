@@ -28,7 +28,7 @@ export function SettingsDialog({
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
-        <DialogDescription>
+        <DialogDescription className="sr-only">
           Customize your mindsweeping experience
         </DialogDescription>
         <div className="flex items-center justify-between space-x-2">

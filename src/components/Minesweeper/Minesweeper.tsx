@@ -184,7 +184,6 @@ export const Minesweeper = ({
     <div className={styles.minesweeper}>
       <div className={`${styles.menu} ${styles.options}`}>
         <Options
-          difficultyLevels={DIFFICULTY_LEVELS}
           currentDifficulty={difficulty}
           setDifficulty={setDifficulty}
           holdToFlag={holdToFlag}

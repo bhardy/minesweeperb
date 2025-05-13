@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,13 +20,13 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
-import type { Level } from "@/types/minesweeper";
+import { DIFFICULTY_LEVELS, GAME_MODES } from "@/types/constants";
 import { RecordsDialog } from "./RecordsDialog";
 import { SettingsDialog } from "./SettingsDialog";
 import { ArchiveDialog } from "./DailyChallenge/ArchiveDialog";
+import { DailyStatusDialog } from "./DailyChallenge/DailyStatusDialog";
 
 interface OptionsProps {
-  difficultyLevels: Level[];
   currentDifficulty: number;
   setDifficulty: (difficulty: number) => void;
   holdToFlag: boolean;
@@ -34,7 +34,6 @@ interface OptionsProps {
 }
 
 export function Options({
-  difficultyLevels,
   currentDifficulty,
   setDifficulty,
   holdToFlag,
@@ -43,7 +42,14 @@ export function Options({
   const [recordsOpen, setRecordsOpen] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [archiveOpen, setArchiveOpen] = React.useState(false);
+  const [dailyStatusOpen, setDailyStatusOpen] = React.useState(false);
+
   const router = useRouter();
+  const pathname = usePathname();
+
+  const currentGameMode = pathname?.includes("daily") ? "daily" : "classic";
+
+  const formattedDate = format(new Date(), "MMMM-d-yy").toLowerCase();
 
   return (
     <>
@@ -59,46 +65,62 @@ export function Options({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-48">
           <DropdownMenuLabel>Select Difficulty</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          {/* <DropdownMenuSeparator /> */}
           <DropdownMenuRadioGroup
             value={currentDifficulty.toString()}
             onValueChange={(value) => setDifficulty(parseInt(value))}
           >
-            {difficultyLevels.map((level, index) => (
+            {DIFFICULTY_LEVELS.map((level, index) => (
               <DropdownMenuRadioItem key={level.name} value={index.toString()}>
                 {level.name.charAt(0).toUpperCase() + level.name.slice(1)}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem onSelect={() => setRecordsOpen(true)}>
-              View Best Times
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
-              Settings
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+          <DropdownMenuLabel>Game Mode</DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={currentGameMode}
+            onValueChange={(value) => {
+              if (value === "daily") {
+                router.push(
+                  `/daily/${formattedDate}/${DIFFICULTY_LEVELS[currentDifficulty].name}`
+                );
+              } else {
+                router.push("/");
+              }
+            }}
+          >
+            {GAME_MODES.map((mode) => (
+              <DropdownMenuRadioItem key={mode.name} value={mode.value}>
+                {mode.name.charAt(0).toUpperCase() + mode.name.slice(1)}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Daily Challenge</DropdownMenuSubTrigger>
+            <DropdownMenuSubTrigger>Daily Status</DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem
-                  onSelect={() =>
-                    router.push(
-                      `/daily/${format(new Date(), "MMMM-d-yy").toLowerCase()}`
-                    )
-                  }
-                >
-                  Today&apos;s Challenge
+                <DropdownMenuItem onSelect={() => setDailyStatusOpen(true)}>
+                  Challenges for {format(new Date(), "MMMM do")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setArchiveOpen(true)}>
-                  View Archive
+                  Daily Challenge Archive
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {currentGameMode === "classic" && (
+              <DropdownMenuItem onSelect={() => setRecordsOpen(true)}>
+                View Best Times
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
+              Settings
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       {recordsOpen && (
@@ -110,6 +132,13 @@ export function Options({
           onClose={() => setSettingsOpen(false)}
           holdToFlag={holdToFlag}
           onHoldToFlagChange={onHoldToFlagChange}
+        />
+      )}
+      {dailyStatusOpen && (
+        <DailyStatusDialog
+          date={formattedDate}
+          isOpen={true}
+          onClose={() => setDailyStatusOpen(false)}
         />
       )}
       {archiveOpen && (

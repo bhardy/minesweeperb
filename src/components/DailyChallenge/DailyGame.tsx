@@ -1,21 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Minesweeper } from "@/components/Minesweeper/Minesweeper";
-import { format, parse } from "date-fns";
 import { DIFFICULTY_LEVELS } from "@/types/constants";
 import type { GameState, AllResults, DifficultyKey } from "@/types/minesweeper";
 import useLocalStorage from "use-local-storage";
 import { ChallengeComplete } from "./ChallengeComplete";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { DayResult } from "./DayResult";
 
 export function DailyGame({
   date,
@@ -24,8 +13,6 @@ export function DailyGame({
   date: string;
   difficulty: string;
 }) {
-  const [showResults, setShowResults] = useState(false);
-  const dateObj = parse(date, "MMMM-d-yy", new Date());
   const difficultyIndex = DIFFICULTY_LEVELS.findIndex(
     (level) => level.name === difficulty
   );
@@ -70,35 +57,11 @@ export function DailyGame({
   };
 
   return (
-    <>
-      <div className="flex flex-col items-center gap-2 p-4 min-h-[100px]">
-        <h1 className="text-2xl font-bold">
-          Daily Challenge: {format(dateObj, "MMMM d, yyyy")} ({difficulty})
-        </h1>
-
-        <Button variant="outline" onClick={() => setShowResults(true)}>
-          View Results
-        </Button>
-      </div>
-
-      <Dialog open={showResults} onOpenChange={setShowResults}>
-        <DialogContent className="sm:max-w-[360px]">
-          <DialogHeader>
-            <DialogTitle>{format(dateObj, "MMMM d, yyyy")}</DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="sr-only">
-            Results for {format(dateObj, "MMMM d, yyyy")}
-          </DialogDescription>
-          <DayResult results={results} date={date} />
-        </DialogContent>
-      </Dialog>
-
-      <Minesweeper
-        seed={date}
-        onGameEnd={handleGameEnd}
-        initialDifficulty={difficultyIndex}
-        WinDialog={ChallengeComplete}
-      />
-    </>
+    <Minesweeper
+      seed={date}
+      onGameEnd={handleGameEnd}
+      initialDifficulty={difficultyIndex}
+      WinDialog={ChallengeComplete}
+    />
   );
 }
