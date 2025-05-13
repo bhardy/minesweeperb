@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Minesweeper } from "@/components/Minesweeper/Minesweeper";
 import { format, parse } from "date-fns";
 import { DIFFICULTY_LEVELS } from "@/types/constants";
@@ -24,7 +24,6 @@ export function DailyGame({
   date: string;
   difficulty: string;
 }) {
-  const [isClient, setIsClient] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const dateObj = parse(date, "MMMM-d-yy", new Date());
   const difficultyIndex = DIFFICULTY_LEVELS.findIndex(
@@ -40,17 +39,11 @@ export function DailyGame({
     }
   );
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const existingResults = results[difficulty as DifficultyKey]?.[date];
-
   const handleGameEnd = (gameState: GameState) => {
     if (!gameState.startTime || !gameState.endTime) return;
 
     const difficultyKey = gameState.config.name as DifficultyKey;
-    const difficultyResults = results[difficultyKey] || {};
+    const difficultyResults = results?.[difficultyKey] || {};
 
     if (!difficultyResults[date] || difficultyResults[date].status === "lost") {
       const status =
@@ -83,11 +76,9 @@ export function DailyGame({
           Daily Challenge: {format(dateObj, "MMMM d, yyyy")} ({difficulty})
         </h1>
 
-        {isClient && existingResults?.status && (
-          <Button variant="outline" onClick={() => setShowResults(true)}>
-            View Results
-          </Button>
-        )}
+        <Button variant="outline" onClick={() => setShowResults(true)}>
+          View Results
+        </Button>
       </div>
 
       <Dialog open={showResults} onOpenChange={setShowResults}>
