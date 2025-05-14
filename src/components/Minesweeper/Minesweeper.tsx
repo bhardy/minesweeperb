@@ -109,18 +109,7 @@ export const Minesweeper = ({
 
   const handleSecondaryAction = (x: number, y: number) => {
     if (gameState.status === "won") return;
-    // if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
-    if (gameBoard[y][x].isRevealed) {
-      const { gameBoard: nextGameBoard, gameState: nextGameState } = chordClick(
-        { x, y },
-        gameBoard,
-        gameState
-      );
-
-      setGameBoard(nextGameBoard);
-      setGameState(nextGameState);
-      return;
-    }
+    if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
 
     const newBoard = gameBoard.map((row, rowIndex) =>
       row.map((cell, colIndex) =>
@@ -142,6 +131,20 @@ export const Minesweeper = ({
       ...prevState,
       flaggedMines: newFlagCount,
     }));
+  };
+
+  const handleTertiaryAction = (x: number, y: number) => {
+    if (gameBoard[y][x].isRevealed) {
+      const { gameBoard: nextGameBoard, gameState: nextGameState } = chordClick(
+        { x, y },
+        gameBoard,
+        gameState
+      );
+
+      setGameBoard(nextGameBoard);
+      setGameState(nextGameState);
+      return;
+    }
   };
 
   const handleGameWin = useCallback(
@@ -228,6 +231,7 @@ export const Minesweeper = ({
         gameState={gameState}
         onPrimaryAction={handlePrimaryAction}
         onSecondaryAction={handleSecondaryAction}
+        onTertiaryAction={handleTertiaryAction}
         holdToFlag={holdToFlag}
       />
       {isDebug && (

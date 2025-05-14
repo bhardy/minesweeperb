@@ -4,6 +4,7 @@ type UsePressHandlerOptions = {
   onClick?: () => void;
   onHold?: () => void;
   onRightClick?: () => void;
+  onLeftAndRightClick?: () => void;
   holdDuration?: number;
 };
 
@@ -18,12 +19,15 @@ export function usePressHandler({
   onClick,
   onHold,
   onRightClick,
+  onLeftAndRightClick,
   holdDuration = 250,
 }: UsePressHandlerOptions): UsePressHandlerReturn {
   const targetRef = useRef<HTMLElement | null>(null);
   const timeoutRef = useRef<number | undefined>(undefined);
   const isHoldingRef = useRef(false);
+  const isLeftDown = useRef(false);
   const isRightClickRef = useRef(false);
+  const isRightAndLeftDownRef = useRef(false);
   const initialPositionRef = useRef<{ x: number; y: number } | null>(null);
   const isScrollingRef = useRef(false);
 
@@ -48,6 +52,14 @@ export function usePressHandler({
   const handlePointerUp = useCallback(() => {
     document.removeEventListener("pointerup", handlePointerUp);
     document.removeEventListener("pointermove", handlePointerMove);
+
+    isLeftDown.current = false;
+
+    // If the user triggered a chord click, we don't fire this primary click event on pointer up
+    if (isRightAndLeftDownRef.current) {
+      isRightAndLeftDownRef.current = false;
+      return;
+    }
 
     clearTimeout(timeoutRef.current);
     initialPositionRef.current = null;
@@ -80,6 +92,10 @@ export function usePressHandler({
         return;
       }
 
+      if (e.button === 0) {
+        isLeftDown.current = true;
+      }
+
       isHoldingRef.current = false;
       isRightClickRef.current = false;
       isScrollingRef.current = false;
@@ -103,6 +119,14 @@ export function usePressHandler({
   const onContextMenu = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     targetRef.current?.blur();
+
+    if (isLeftDown.current) {
+      onLeftAndRightClick?.();
+      isRightAndLeftDownRef.current = true;
+      isLeftDown.current = false;
+      return;
+    }
+
     onRightClick?.();
   };
 

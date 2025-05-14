@@ -13,6 +13,7 @@ interface CellProps {
   y: number;
   onPrimaryAction: (x: number, y: number) => void;
   onSecondaryAction: (x: number, y: number) => void;
+  onTertiaryAction: (x: number, y: number) => void;
   lastClick?: { x: number; y: number };
   holdToFlag: boolean;
 }
@@ -23,13 +24,30 @@ const Cell = ({
   y,
   onPrimaryAction,
   onSecondaryAction,
+  onTertiaryAction,
   lastClick,
   holdToFlag,
 }: CellProps) => {
   const { ...pressHandlerProps } = usePressHandler({
-    onClick: () => onPrimaryAction(x, y),
-    onHold: holdToFlag ? () => onSecondaryAction(x, y) : undefined,
-    onRightClick: () => onSecondaryAction(x, y),
+    onClick: () => {
+      console.log("primary click");
+      onPrimaryAction(x, y);
+    },
+    onHold: holdToFlag
+      ? () => {
+          console.log("hold click");
+          onSecondaryAction(x, y);
+        }
+      : undefined,
+    onRightClick: () => {
+      console.log("secondary click");
+      onSecondaryAction(x, y);
+    },
+    onLeftAndRightClick: () => {
+      console.log("chord click");
+      onTertiaryAction(x, y);
+      // onSecondaryAction(x, y);
+    },
   });
 
   const isLastClick = lastClick?.x === x && lastClick?.y === y;
@@ -68,6 +86,7 @@ interface GameBoardProps {
   gameState: GameState;
   onPrimaryAction: (x: number, y: number) => void;
   onSecondaryAction: (x: number, y: number) => void;
+  onTertiaryAction: (x: number, y: number) => void;
   holdToFlag: boolean;
 }
 
@@ -76,6 +95,7 @@ export const GameBoard = ({
   gameState,
   onPrimaryAction,
   onSecondaryAction,
+  onTertiaryAction,
   holdToFlag,
 }: GameBoardProps) => {
   return (
@@ -99,6 +119,7 @@ export const GameBoard = ({
                 y={y}
                 onPrimaryAction={onPrimaryAction}
                 onSecondaryAction={onSecondaryAction}
+                onTertiaryAction={onTertiaryAction}
                 lastClick={gameState.lastClick}
                 holdToFlag={holdToFlag}
               />
