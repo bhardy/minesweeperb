@@ -89,6 +89,7 @@ export function usePressHandler({
       // if the user is holding right click we don't fire the onHold
       if (e.button === 2) {
         isRightClickRef.current = true;
+        document.addEventListener("pointerup", handlePointerUp);
         return;
       }
 
@@ -120,7 +121,8 @@ export function usePressHandler({
     e.preventDefault();
     targetRef.current?.blur();
 
-    if (isLeftDown.current) {
+    // @note: this detects if both buttons are pressed
+    if (isLeftDown.current || (e.button === 2 && e.buttons === 3)) {
       onLeftAndRightClick?.();
       isRightAndLeftDownRef.current = true;
       isLeftDown.current = false;

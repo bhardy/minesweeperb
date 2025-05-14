@@ -29,25 +29,10 @@ const Cell = ({
   holdToFlag,
 }: CellProps) => {
   const { ...pressHandlerProps } = usePressHandler({
-    onClick: () => {
-      console.log("primary click");
-      onPrimaryAction(x, y);
-    },
-    onHold: holdToFlag
-      ? () => {
-          console.log("hold click");
-          onSecondaryAction(x, y);
-        }
-      : undefined,
-    onRightClick: () => {
-      console.log("secondary click");
-      onSecondaryAction(x, y);
-    },
-    onLeftAndRightClick: () => {
-      console.log("chord click");
-      onTertiaryAction(x, y);
-      // onSecondaryAction(x, y);
-    },
+    onClick: () => onPrimaryAction(x, y),
+    onHold: holdToFlag ? () => onSecondaryAction(x, y) : undefined,
+    onRightClick: () => onSecondaryAction(x, y),
+    onLeftAndRightClick: () => onTertiaryAction(x, y),
   });
 
   const isLastClick = lastClick?.x === x && lastClick?.y === y;
