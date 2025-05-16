@@ -2,8 +2,8 @@
 
 import { Minesweeper } from "@/components/Minesweeper/Minesweeper";
 import { DIFFICULTY_LEVELS } from "@/types/constants";
-import type { GameState, AllResults, DifficultyKey } from "@/types/minesweeper";
-import useLocalStorage from "use-local-storage";
+import type { GameState, DifficultyKey } from "@/types/minesweeper";
+import { useStore } from "@/store";
 import { ChallengeComplete } from "./ChallengeComplete";
 
 export function DailyGame({
@@ -17,39 +17,77 @@ export function DailyGame({
     (level) => level.name === difficulty
   );
 
-  const [results, setResults] = useLocalStorage<AllResults>(
-    "dailyChallengeResults",
-    {
-      beginner: {},
-      intermediate: {},
-      expert: {},
-    }
-  );
+  const {
+    dailyChallengeResults: results,
+    setDailyChallengeResults: setResults,
+  } = useStore();
 
   const handleGameEnd = (gameState: GameState) => {
     if (!gameState.startTime || !gameState.endTime) return;
 
     const difficultyKey = gameState.config.name as DifficultyKey;
     const difficultyResults = results?.[difficultyKey] || {};
+    const existingResult = difficultyResults[date];
 
-    if (!difficultyResults[date] || difficultyResults[date].status === "lost") {
-      const status =
-        gameState.status === "won"
-          ? difficultyResults[date]?.status === "lost"
-            ? "won-retry"
-            : "won"
-          : "lost";
+    // Only proceed if the game was won
+    if (gameState.status === "won") {
+      const newTime = Math.floor(
+        (gameState.endTime - gameState.startTime) / 1000
+      );
 
+      // Determine the new status
+
+      let newStatus;
+      let shouldUpdateTime = false;
+
+      // If there was no existing status, use the raw status from gameState
+      if (!existingResult?.status) {
+        newStatus = gameState.status;
+
+        if (gameState.status === "won") {
+          shouldUpdateTime = true;
+        }
+      }
+
+      // If the existing status was lost, use won-retry
+      if (existingResult?.status === "lost") {
+        newStatus = "won-retry";
+        shouldUpdateTime = true;
+      }
+
+      // Right now we don't let users improve their time if they had a clean first win
+      if (existingResult?.status === "won") {
+        newStatus = "won";
+        shouldUpdateTime = false;
+      }
+
+      // If the existing status was won, user can improve time
+      if (existingResult?.status === "won-retry") {
+        newStatus = "won-retry";
+        shouldUpdateTime = true;
+      }
+
+      if (shouldUpdateTime) {
+        setResults({
+          ...results,
+          [difficultyKey]: {
+            ...difficultyResults,
+            [date]: {
+              status: newStatus,
+              time: newTime,
+            },
+          },
+        });
+      }
+    } else if (!existingResult) {
+      // Handle loss only if there's no existing result
       setResults({
         ...results,
         [difficultyKey]: {
           ...difficultyResults,
           [date]: {
-            status,
-            time:
-              gameState.status === "won"
-                ? Math.floor((gameState.endTime - gameState.startTime) / 1000)
-                : undefined,
+            status: "lost",
+            time: undefined,
           },
         },
       });

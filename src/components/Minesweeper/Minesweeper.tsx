@@ -20,7 +20,7 @@ import {
   saveBestTime,
   chordClick,
 } from "./game";
-import useLocalStorage from "use-local-storage";
+import { useStore } from "@/store";
 
 export const Minesweeper = ({
   seed,
@@ -43,7 +43,7 @@ export const Minesweeper = ({
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(initialDifficulty ?? 0);
-  const [holdToFlag, setHoldToFlag] = useLocalStorage("holdToFlag", true);
+  const { holdToFlag, setHoldToFlag } = useStore();
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
   const [gameState, setGameState] = useState<GameState>(() =>

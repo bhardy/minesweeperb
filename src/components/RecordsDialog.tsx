@@ -8,18 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BEST_TIMES_KEY } from "@/types/constants";
-
-interface BestTime {
-  name: string;
-  time: number;
-  date: string;
-}
-
-const getBestTimes = (): Record<string, BestTime> => {
-  const times = localStorage.getItem(BEST_TIMES_KEY);
-  return times ? JSON.parse(times) : {};
-};
+import { useStore } from "@/store";
 
 interface RecordsDialogProps {
   isOpen: boolean;
@@ -27,15 +16,7 @@ interface RecordsDialogProps {
 }
 
 export const RecordsDialog = ({ isOpen, onClose }: RecordsDialogProps) => {
-  const [bestTimes, setBestTimes] = React.useState<Record<string, BestTime>>(
-    {}
-  );
-
-  React.useEffect(() => {
-    if (isOpen) {
-      setBestTimes(getBestTimes());
-    }
-  }, [isOpen]);
+  const { bestTimes } = useStore();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -54,10 +35,12 @@ export const RecordsDialog = ({ isOpen, onClose }: RecordsDialogProps) => {
               {Object.entries(bestTimes).map(([difficulty, record]) => (
                 <div key={difficulty} className="space-y-1">
                   <h3 className="font-semibold capitalize">{difficulty}</h3>
-                  <div className="text-sm">
-                    <span className="font-semibold">{record.name}</span>:{" "}
-                    {record.time} seconds
-                  </div>
+                  {record && (
+                    <div className="text-sm">
+                      <span className="font-semibold">{record.name}</span>:{" "}
+                      {record.time} seconds
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

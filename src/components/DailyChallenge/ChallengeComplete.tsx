@@ -5,8 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import useLocalStorage from "use-local-storage";
-import type { AllResults } from "@/types/minesweeper";
+import { useStore } from "@/store";
 import { DayResult } from "./DayResult";
 
 interface ChallengeCompleteProps {
@@ -26,11 +25,7 @@ export const ChallengeComplete = ({
   difficulty,
   seed,
 }: ChallengeCompleteProps) => {
-  const [results] = useLocalStorage<AllResults>("dailyChallengeResults", {
-    beginner: {},
-    intermediate: {},
-    expert: {},
-  });
+  const { dailyChallengeResults: results } = useStore();
 
   const date = seed || "";
 
