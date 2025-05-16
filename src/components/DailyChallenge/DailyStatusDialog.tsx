@@ -9,8 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DayResult } from "./DayResult";
-import useLocalStorage from "use-local-storage";
-import { AllResults } from "@/types/minesweeper";
+import { useStore } from "@/store";
 
 interface DailyDialogProps {
   date: string;
@@ -19,11 +18,7 @@ interface DailyDialogProps {
 }
 
 export function DailyStatusDialog({ date, isOpen, onClose }: DailyDialogProps) {
-  const [results] = useLocalStorage<AllResults>("dailyChallengeResults", {
-    beginner: {},
-    intermediate: {},
-    expert: {},
-  });
+  const { dailyChallengeResults: results } = useStore();
 
   const dateObj = parse(date, "MMMM-d-yy", new Date());
   const formattedDate = format(dateObj, "MMMM d, yyyy");

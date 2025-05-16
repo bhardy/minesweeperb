@@ -1,10 +1,6 @@
-import type {
-  Level,
-  GameBoard,
-  GameState,
-  BestTime,
-} from "@/types/minesweeper";
-import { BEST_TIMES_KEY } from "@/types/constants";
+import type { Level, GameBoard, GameState } from "@/types/minesweeper";
+import { useStore } from "@/store";
+import type { BestTimes } from "@/store";
 
 // Helper function to generate deterministic mine positions based on a date
 // @note: 🙀 cursor wrote this, need to review it and add tests
@@ -471,9 +467,9 @@ export const chordClick = (
   return { gameBoard: newBoard, gameState: newGameState };
 };
 
-export const getBestTimes = (): Record<string, BestTime> => {
-  const times = localStorage.getItem(BEST_TIMES_KEY);
-  return times ? JSON.parse(times) : {};
+export const getBestTimes = (): BestTimes => {
+  const store = useStore.getState();
+  return store.bestTimes;
 };
 
 export const saveBestTime = (
@@ -481,16 +477,12 @@ export const saveBestTime = (
   name: string,
   time: number
 ) => {
-  const times = getBestTimes();
-  times[difficulty] = {
-    name,
-    time,
-    date: new Date().toISOString(),
-  };
-  localStorage.setItem(BEST_TIMES_KEY, JSON.stringify(times));
+  const store = useStore.getState();
+  store.addBestTime(difficulty, name, time);
 };
 
 export const isNewBestTime = (difficulty: string, time: number): boolean => {
-  const times = getBestTimes();
-  return !times[difficulty] || time < times[difficulty].time;
+  const store = useStore.getState();
+  const bestTime = store.getBestTime(difficulty);
+  return !bestTime || time < bestTime.time;
 };

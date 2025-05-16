@@ -8,8 +8,7 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { LATEST_USERNAME_KEY } from "@/types/constants";
-import useLocalStorage from "use-local-storage";
+import { useStore } from "@/store";
 
 interface NewBestTimeProps {
   isOpen: boolean;
@@ -28,12 +27,12 @@ export const NewBestTime = ({
   difficulty,
   seed,
 }: NewBestTimeProps) => {
-  const [name, setName] = useLocalStorage(LATEST_USERNAME_KEY, "");
+  const { latestUsername, setLatestUsername } = useStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name?.trim()) {
-      onSubmit(name.trim());
+    if (latestUsername?.trim()) {
+      onSubmit(latestUsername.trim());
     }
   };
 
@@ -68,14 +67,16 @@ export const NewBestTime = ({
                   type="text"
                   name="recordHolder"
                   placeholder="Enter your name"
-                  value={name ?? ""}
-                  onChange={(e) => setName(e.target.value.slice(0, 15))}
+                  value={latestUsername ?? ""}
+                  onChange={(e) =>
+                    setLatestUsername(e.target.value.slice(0, 15))
+                  }
                   maxLength={15}
                   autoFocus
                   autoComplete="off"
                 />
               </div>
-              <Button type="submit" disabled={!name?.trim()}>
+              <Button type="submit" disabled={!latestUsername?.trim()}>
                 Save
               </Button>
             </div>
