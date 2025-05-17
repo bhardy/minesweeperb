@@ -17,6 +17,20 @@ export interface BestTimes {
   [difficulty: string]: BestTime | null;
 }
 
+export type CellAction = "reveal" | "flag" | "none" | "quick-reveal";
+
+export interface CellSettings {
+  leftClick: CellAction;
+  rightClick: CellAction;
+  leftRightClick: CellAction;
+  hold: CellAction;
+}
+
+export interface GameSettings {
+  unrevealedCells: CellSettings;
+  revealedCells: CellSettings;
+}
+
 interface AppState {
   // Daily Challenge Results
   dailyChallengeResults: Record<DifficultyKey, Record<string, GameResult>>;
@@ -29,8 +43,16 @@ interface AppState {
   setLatestUsername: (name: string) => void;
 
   // Game Settings
-  holdToFlag: boolean;
-  setHoldToFlag: (value: boolean) => void;
+  gameSettings: GameSettings;
+  setGameSettings: (settings: GameSettings) => void;
+  updateUnrevealedCellSetting: (
+    action: keyof CellSettings,
+    value: CellAction
+  ) => void;
+  updateRevealedCellSetting: (
+    action: keyof CellSettings,
+    value: CellAction
+  ) => void;
 
   // Best Times
   bestTimes: BestTimes;
@@ -56,8 +78,41 @@ export const useStore = create<AppState>()(
       setLatestUsername: (name) => set({ latestUsername: name }),
 
       // Game Settings
-      holdToFlag: true,
-      setHoldToFlag: (value) => set({ holdToFlag: value }),
+      gameSettings: {
+        unrevealedCells: {
+          leftClick: "reveal",
+          rightClick: "flag",
+          leftRightClick: "none",
+          hold: "flag",
+        },
+        revealedCells: {
+          leftClick: "none",
+          rightClick: "none",
+          leftRightClick: "quick-reveal",
+          hold: "none",
+        },
+      },
+      setGameSettings: (settings) => set({ gameSettings: settings }),
+      updateUnrevealedCellSetting: (action, value) =>
+        set((state) => ({
+          gameSettings: {
+            ...state.gameSettings,
+            unrevealedCells: {
+              ...state.gameSettings.unrevealedCells,
+              [action]: value,
+            },
+          },
+        })),
+      updateRevealedCellSetting: (action, value) =>
+        set((state) => ({
+          gameSettings: {
+            ...state.gameSettings,
+            revealedCells: {
+              ...state.gameSettings.revealedCells,
+              [action]: value,
+            },
+          },
+        })),
 
       // Best Times
       bestTimes: {},
@@ -84,7 +139,7 @@ export const useStore = create<AppState>()(
       partialize: (state) => ({
         dailyChallengeResults: state.dailyChallengeResults,
         latestUsername: state.latestUsername,
-        holdToFlag: state.holdToFlag,
+        gameSettings: state.gameSettings,
         bestTimes: state.bestTimes,
       }),
     }

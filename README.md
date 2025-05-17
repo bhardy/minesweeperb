@@ -33,9 +33,10 @@
 - [ ] add expanded mode -- mostly for mobile
 - [ ] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
 - [ ] add question marks
-- [ ] enable chording on mobile
+- [x] enable chording on mobile
 - [ ] address accidental flags while moving fast (with mouse)
 - [ ] address stuck focus state on cells
+- [ ] when holding quick reveal there's sometimes a bug where the user can see the revealed cell and then not reveal it
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

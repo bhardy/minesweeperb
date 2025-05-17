@@ -29,16 +29,9 @@ import { DailyStatusDialog } from "./DailyChallenge/DailyStatusDialog";
 interface OptionsProps {
   currentDifficulty: number;
   setDifficulty: (difficulty: number) => void;
-  holdToFlag: boolean;
-  onHoldToFlagChange: (enabled: boolean) => void;
 }
 
-export function Options({
-  currentDifficulty,
-  setDifficulty,
-  holdToFlag,
-  onHoldToFlagChange,
-}: OptionsProps) {
+export function Options({ currentDifficulty, setDifficulty }: OptionsProps) {
   const [recordsOpen, setRecordsOpen] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [archiveOpen, setArchiveOpen] = React.useState(false);
@@ -130,12 +123,7 @@ export function Options({
         <RecordsDialog isOpen={true} onClose={() => setRecordsOpen(false)} />
       )}
       {settingsOpen && (
-        <SettingsDialog
-          isOpen={true}
-          onClose={() => setSettingsOpen(false)}
-          holdToFlag={holdToFlag}
-          onHoldToFlagChange={onHoldToFlagChange}
-        />
+        <SettingsDialog isOpen={true} onClose={() => setSettingsOpen(false)} />
       )}
       {dailyStatusOpen && (
         <DailyStatusDialog

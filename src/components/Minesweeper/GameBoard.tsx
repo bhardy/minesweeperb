@@ -6,6 +6,7 @@ import type {
   Cell,
 } from "@/types/minesweeper";
 import { usePressHandler } from "@/hooks/usePressHandler";
+import { useStore } from "@/store";
 
 interface CellProps {
   cell: Cell;
@@ -15,7 +16,6 @@ interface CellProps {
   onSecondaryAction: (x: number, y: number) => void;
   onTertiaryAction: (x: number, y: number) => void;
   lastClick?: { x: number; y: number };
-  holdToFlag: boolean;
 }
 
 const Cell = ({
@@ -26,13 +26,35 @@ const Cell = ({
   onSecondaryAction,
   onTertiaryAction,
   lastClick,
-  holdToFlag,
 }: CellProps) => {
+  const { gameSettings } = useStore();
+  const settings = cell.isRevealed
+    ? gameSettings.revealedCells
+    : gameSettings.unrevealedCells;
+
+  const handleAction = (action: string) => {
+    switch (action) {
+      case "reveal":
+        onPrimaryAction(x, y);
+        break;
+      case "flag":
+        onSecondaryAction(x, y);
+        break;
+      case "quick-reveal":
+        onTertiaryAction(x, y);
+        break;
+      case "none":
+        // Do nothing
+        break;
+    }
+  };
+
   const { ...pressHandlerProps } = usePressHandler({
-    onClick: () => onPrimaryAction(x, y),
-    onHold: holdToFlag ? () => onSecondaryAction(x, y) : undefined,
-    onRightClick: () => onSecondaryAction(x, y),
-    onLeftAndRightClick: () => onTertiaryAction(x, y),
+    onClick: () => handleAction(settings.leftClick),
+    onHold:
+      settings.hold !== "none" ? () => handleAction(settings.hold) : undefined,
+    onRightClick: () => handleAction(settings.rightClick),
+    onLeftAndRightClick: () => handleAction(settings.leftRightClick),
   });
 
   const isLastClick = lastClick?.x === x && lastClick?.y === y;
@@ -72,7 +94,6 @@ interface GameBoardProps {
   onPrimaryAction: (x: number, y: number) => void;
   onSecondaryAction: (x: number, y: number) => void;
   onTertiaryAction: (x: number, y: number) => void;
-  holdToFlag: boolean;
 }
 
 export const GameBoard = ({
@@ -81,7 +102,6 @@ export const GameBoard = ({
   onPrimaryAction,
   onSecondaryAction,
   onTertiaryAction,
-  holdToFlag,
 }: GameBoardProps) => {
   return (
     <div
@@ -106,7 +126,6 @@ export const GameBoard = ({
                 onSecondaryAction={onSecondaryAction}
                 onTertiaryAction={onTertiaryAction}
                 lastClick={gameState.lastClick}
-                holdToFlag={holdToFlag}
               />
             ))}
           </div>

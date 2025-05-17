@@ -20,7 +20,6 @@ import {
   saveBestTime,
   chordClick,
 } from "./game";
-import { useStore } from "@/store";
 
 export const Minesweeper = ({
   seed,
@@ -43,7 +42,6 @@ export const Minesweeper = ({
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(initialDifficulty ?? 0);
-  const { holdToFlag, setHoldToFlag } = useStore();
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
 
   const [gameState, setGameState] = useState<GameState>(() =>
@@ -198,12 +196,7 @@ export const Minesweeper = ({
   return (
     <div className={styles.minesweeper}>
       <div className={`${styles.menu} ${styles.options}`}>
-        <Options
-          currentDifficulty={difficulty}
-          setDifficulty={setDifficulty}
-          holdToFlag={holdToFlag}
-          onHoldToFlagChange={setHoldToFlag}
-        />
+        <Options currentDifficulty={difficulty} setDifficulty={setDifficulty} />
       </div>
       <div
         className={classNames(styles.menu, {
@@ -232,7 +225,6 @@ export const Minesweeper = ({
         onPrimaryAction={handlePrimaryAction}
         onSecondaryAction={handleSecondaryAction}
         onTertiaryAction={handleTertiaryAction}
-        holdToFlag={holdToFlag}
       />
       {isDebug && (
         <pre
