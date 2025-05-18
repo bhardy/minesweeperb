@@ -1,8 +1,16 @@
 .minesweeper {
-  display: inline-block;
-  outline: 2px solid #a4a4a4;
-  margin: calc(var(--spacing) * 4);
+  display: inline-flex;
+  flex-direction: column;
+  border: 2px solid #a4a4a4;
+  margin: auto;
   user-select: none;
+  background-image: var(--stipple-pattern);
+  background-size: var(--stipple-size) var(--stipple-size);
+  background-position: 0 0, 0 calc(var(--stipple-size) / 2),
+    calc(var(--stipple-size) / 2) calc(var(--stipple-size) / -2),
+    calc(var(--stipple-size) / -2) 0;
+  background-color: var(--stipple-bg);
+
   --count-1: #0000ff;
   --count-2: #008000;
   --count-3: #ff0000;
@@ -13,11 +21,22 @@
   --count-8: #808080;
 }
 
+.minesweeper.maximized {
+  margin: 0;
+  flex: 1 0 auto;
+}
+
+.board {
+  display: grid;
+  flex: 1 0 auto;
+  overflow: auto;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--cols), 24px);
   grid-template-rows: repeat(var(--rows), 24px);
-  outline: 1px solid #a4a4a4;
+  place-self: center;
 }
 
 /* @note: rows are not styled for web */
@@ -162,7 +181,8 @@
 }
 
 .options {
-  padding: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
   background-color: #e3e3e3;
 }
 
