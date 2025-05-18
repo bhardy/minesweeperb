@@ -120,3 +120,26 @@
     @apply bg-background text-foreground;
   }
 }
+
+html,
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* @todo: update this to use the theme colors */
+:root {
+  --stipple-size: 8px;
+  --stipple-color: #c3c3c3;
+  --stipple-bg: #cccccc;
+  --stipple-opacity: 1;
+  --stipple-pattern: linear-gradient(
+      45deg,
+      var(--stipple-color) 25%,
+      transparent 25%
+    ),
+    linear-gradient(-45deg, var(--stipple-color) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--stipple-color) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--stipple-color) 75%);
+}

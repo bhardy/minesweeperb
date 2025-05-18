@@ -59,6 +59,10 @@ interface AppState {
   setBestTimes: (times: BestTimes) => void;
   addBestTime: (difficulty: string, name: string, time: number) => void;
   getBestTime: (difficulty: string) => BestTime | null;
+
+  // Maximize State
+  isMaximized: boolean;
+  setIsMaximized: (isMaximized: boolean) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -133,6 +137,10 @@ export const useStore = create<AppState>()(
       getBestTime: (difficulty: string) => {
         return get().bestTimes[difficulty] || null;
       },
+
+      // Maximize State
+      isMaximized: false,
+      setIsMaximized: (isMaximized) => set({ isMaximized }),
     }),
     {
       name: "minesweeper-storage",
@@ -141,6 +149,7 @@ export const useStore = create<AppState>()(
         latestUsername: state.latestUsername,
         gameSettings: state.gameSettings,
         bestTimes: state.bestTimes,
+        isMaximized: state.isMaximized,
       }),
     }
   )

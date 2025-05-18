@@ -20,6 +20,8 @@ import {
   saveBestTime,
   chordClick,
 } from "./game";
+import { MaximizeToggle } from "@/components/MaximizeToggle";
+import { useStore } from "@/store";
 
 export const Minesweeper = ({
   seed,
@@ -43,6 +45,7 @@ export const Minesweeper = ({
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(initialDifficulty ?? 0);
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
+  const { isMaximized } = useStore();
 
   const [gameState, setGameState] = useState<GameState>(() =>
     getInitialGameState(
@@ -194,9 +197,14 @@ export const Minesweeper = ({
   }, [gameState, onGameEnd]);
 
   return (
-    <div className={styles.minesweeper}>
+    <div
+      className={classNames(styles.minesweeper, {
+        [styles.maximized]: isMaximized,
+      })}
+    >
       <div className={`${styles.menu} ${styles.options}`}>
         <Options currentDifficulty={difficulty} setDifficulty={setDifficulty} />
+        <MaximizeToggle />
       </div>
       <div
         className={classNames(styles.menu, {
