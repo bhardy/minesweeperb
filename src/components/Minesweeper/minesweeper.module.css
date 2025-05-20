@@ -21,6 +21,13 @@
   --count-8: #808080;
 }
 
+@media (max-width: 768px) {
+  .minesweeper {
+    margin: 0;
+    flex: 1 0 auto;
+  }
+}
+
 .minesweeper.maximized {
   margin: 0;
   flex: 1 0 auto;

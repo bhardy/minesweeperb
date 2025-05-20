@@ -79,12 +79,13 @@ export function usePressHandler({
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
+      // @TODO : confirm we can remove this and that it's handled by useGesture
       // Check for multi-touch by looking at the number of active touches
-      const nativeEvent = e.nativeEvent as unknown as TouchEvent;
-      if (e.pointerType === "touch" && nativeEvent.touches?.length > 1) {
-        targetRef.current?.blur();
-        return;
-      }
+      // const nativeEvent = e.nativeEvent as unknown as TouchEvent;
+      // if (e.pointerType === "touch" && nativeEvent.touches?.length > 1) {
+      //   targetRef.current?.blur();
+      //   return;
+      // }
 
       // if the user is holding right click we don't fire the onHold
       if (e.button === 2) {
