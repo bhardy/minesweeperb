@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
+import { useMediaQuery } from "@react-hook/media-query";
 import styles from "./minesweeper.module.css";
 import { Options } from "../Options";
 import { GameBoard } from "./GameBoard";
@@ -45,7 +46,14 @@ export const Minesweeper = ({
   const isDebug = searchParams.has("debug");
   const [difficulty, setDifficulty] = useState<number>(initialDifficulty ?? 0);
   const currentConfig = DIFFICULTY_LEVELS[difficulty];
-  const { isMaximized } = useStore();
+  const { isMaximized, setIsMaximized } = useStore();
+  const isSmallScreen = useMediaQuery("(max-width: 768px)");
+
+  useEffect(() => {
+    if (isSmallScreen) {
+      setIsMaximized(true);
+    }
+  }, [isSmallScreen, setIsMaximized]);
 
   const [gameState, setGameState] = useState<GameState>(() =>
     getInitialGameState(
