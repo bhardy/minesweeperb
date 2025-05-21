@@ -7,6 +7,9 @@ import type {
 } from "@/types/minesweeper";
 import { usePressHandler } from "@/hooks/usePressHandler";
 import { useStore } from "@/store";
+import { useGesture } from "@use-gesture/react";
+import { useSpring, animated } from "@react-spring/web";
+import { useRef } from "react";
 
 interface CellProps {
   cell: Cell;
@@ -103,6 +106,48 @@ export const GameBoard = ({
   onSecondaryAction,
   onTertiaryAction,
 }: GameBoardProps) => {
+  const { isMaximized } = useStore();
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [springs, api] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    scale: 1,
+    config: { tension: 300, friction: 30 },
+  }));
+
+  useGesture(
+    {
+      onDrag: ({ offset: [x, y] }) => {
+        if (isMaximized) {
+          api.start({ x, y });
+        }
+      },
+      onPinch: ({ offset: [scale] }) => {
+        if (isMaximized) {
+          api.start({ scale });
+        }
+      },
+    },
+    {
+      target: ref,
+      drag: {
+        bounds: {
+          left: -1000,
+          right: 1000,
+          top: -1000,
+          bottom: 1000,
+        },
+        enabled: isMaximized,
+      },
+      pinch: {
+        scaleBounds: { min: 0.2, max: 10 },
+        rubberband: true,
+        enabled: isMaximized,
+      },
+    }
+  );
+
   return (
     <div
       className={styles.board}
@@ -113,7 +158,11 @@ export const GameBoard = ({
         } as React.CSSProperties
       }
     >
-      <div className={styles.grid}>
+      <animated.div
+        className={styles.grid}
+        style={isMaximized ? springs : undefined}
+        ref={ref}
+      >
         {gameBoard.map((row, y) => (
           <div key={y} className={styles.row}>
             {row.map((cell, x) => (
@@ -130,7 +179,7 @@ export const GameBoard = ({
             ))}
           </div>
         ))}
-      </div>
+      </animated.div>
     </div>
   );
 };

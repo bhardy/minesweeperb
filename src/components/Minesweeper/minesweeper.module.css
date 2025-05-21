@@ -36,7 +36,7 @@
 .board {
   display: grid;
   flex: 1 0 auto;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .grid {
@@ -44,11 +44,17 @@
   grid-template-columns: repeat(var(--cols), 24px);
   grid-template-rows: repeat(var(--rows), 24px);
   place-self: center;
+
+  /* @note these are for useGesture / react-sprign pinch and drag */
+  user-select: none;
+  touch-action: none;
 }
 
 /* @note: rows are not styled for web */
 .row {
   display: contents;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 
 .cell {
@@ -184,7 +190,7 @@
   background-color: #d6d6d6;
   gap: 2px;
   padding: 4px;
-  outline: 1px solid #bababa;
+  border: 1px solid #bababa;
 }
 
 .options {
