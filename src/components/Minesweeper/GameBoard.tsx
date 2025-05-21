@@ -120,8 +120,9 @@ export const GameBoard = ({
 
   useGesture(
     {
-      onDrag: ({ movement: [x, y], first }) => {
-        if (isMaximized) {
+      onDrag: ({ event, movement: [x, y], first }) => {
+        const isTouch = (event as PointerEvent).pointerType === "touch";
+        if (isMaximized && isTouch) {
           if (first) {
             // Start from the last known position
             lastPosition.current = { x: springs.x.get(), y: springs.y.get() };
@@ -134,8 +135,9 @@ export const GameBoard = ({
           });
         }
       },
-      onPinch: ({ movement: [scale] }) => {
-        if (isMaximized) {
+      onPinch: ({ event, movement: [scale] }) => {
+        const isTouch = (event as PointerEvent).pointerType === "touch";
+        if (isMaximized && isTouch) {
           api.start({ scale, immediate: true });
         }
       },
