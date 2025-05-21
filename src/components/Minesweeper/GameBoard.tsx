@@ -155,15 +155,15 @@ export const GameBoard = ({
         {
           "--rows": gameState.config.height,
           "--cols": gameState.config.width,
+          touchAction: "none",
+          userSelect: "none",
         } as React.CSSProperties
       }
+      ref={ref}
     >
       <animated.div
         className={styles.grid}
-        style={{
-          ...(isMaximized ? springs : {}),
-        }}
-        ref={ref}
+        style={isMaximized ? springs : undefined}
       >
         {gameBoard.map((row, y) => (
           <div key={y} className={styles.row}>
