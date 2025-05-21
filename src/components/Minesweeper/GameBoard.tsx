@@ -116,11 +116,22 @@ export const GameBoard = ({
     config: { tension: 400, friction: 25, immediate: true },
   }));
 
+  const lastPosition = useRef({ x: 0, y: 0 });
+
   useGesture(
     {
-      onDrag: ({ movement: [x, y] }) => {
+      onDrag: ({ movement: [x, y], first }) => {
         if (isMaximized) {
-          api.start({ x, y, immediate: true });
+          if (first) {
+            // Start from the last known position
+            lastPosition.current = { x: springs.x.get(), y: springs.y.get() };
+          }
+          // Add the movement to the last position
+          api.start({
+            x: lastPosition.current.x + x,
+            y: lastPosition.current.y + y,
+            immediate: true,
+          });
         }
       },
       onPinch: ({ movement: [scale] }) => {
