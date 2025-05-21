@@ -113,19 +113,19 @@ export const GameBoard = ({
     x: 0,
     y: 0,
     scale: 1,
-    config: { tension: 300, friction: 30 },
+    config: { tension: 400, friction: 25, immediate: true },
   }));
 
   useGesture(
     {
-      onDrag: ({ offset: [x, y] }) => {
+      onDrag: ({ movement: [x, y] }) => {
         if (isMaximized) {
-          api.start({ x, y });
+          api.start({ x, y, immediate: true });
         }
       },
-      onPinch: ({ offset: [scale] }) => {
+      onPinch: ({ movement: [scale] }) => {
         if (isMaximized) {
-          api.start({ scale });
+          api.start({ scale, immediate: true });
         }
       },
     },
@@ -160,7 +160,9 @@ export const GameBoard = ({
     >
       <animated.div
         className={styles.grid}
-        style={isMaximized ? springs : undefined}
+        style={{
+          ...(isMaximized ? springs : {}),
+        }}
         ref={ref}
       >
         {gameBoard.map((row, y) => (
