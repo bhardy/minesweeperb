@@ -206,7 +206,7 @@ export const Minesweeper = ({
 
   return (
     <div
-      className={classNames(styles.minesweeper, {
+      className={classNames(styles.minesweeper, "stippled-background", {
         [styles.maximized]: isMaximized,
       })}
     >

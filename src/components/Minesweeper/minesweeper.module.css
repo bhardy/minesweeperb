@@ -4,12 +4,10 @@
   border: 2px solid #a4a4a4;
   margin: auto;
   user-select: none;
-  background-image: var(--stipple-pattern);
-  background-size: var(--stipple-size) var(--stipple-size);
-  background-position: 0 0, 0 calc(var(--stipple-size) / 2),
-    calc(var(--stipple-size) / 2) calc(var(--stipple-size) / -2),
-    calc(var(--stipple-size) / -2) 0;
-  background-color: var(--stipple-bg);
+
+  --stipple-size: 8px;
+  --stipple-color: #c3c3c3;
+  --stipple-bg: #bbbbbb;
 
   --count-1: #0000ff;
   --count-2: #008000;
@@ -37,6 +35,7 @@
   display: grid;
   flex: 1 0 auto;
   overflow: hidden;
+  border: 1px solid #bababa;
 
   /* @note these are for useGesture / react-sprign pinch and drag */
   user-select: none;
