@@ -145,7 +145,7 @@ describe("usePressHandler", () => {
   });
 
   // @todo: this is really hard to test, it needs to be manually tested until we figure out how to do it in here
-  it.skip("should not trigger onClick when scrolling", () => {});
+  it("should not trigger onClick when scrolling", () => {});
 
   it("should not trigger onHold when right clicking", () => {
     render(
@@ -172,7 +172,7 @@ describe("usePressHandler", () => {
     expect(onLeftAndRightClick).not.toHaveBeenCalled();
   });
 
-  it.only("should handle multiple interactions in sequence without interference", () => {
+  it("should handle multiple interactions in sequence without interference", () => {
     render(
       <TestComponent
         onClick={onClick}

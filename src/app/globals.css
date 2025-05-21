@@ -129,12 +129,15 @@ body {
 }
 
 /* @todo: update this to use the theme colors */
+/* @note: since this is used on `body` any children will need to override */
 :root {
-  --stipple-size: 8px;
-  --stipple-color: #c3c3c3;
-  --stipple-bg: #cccccc;
-  --stipple-opacity: 1;
-  --stipple-pattern: linear-gradient(
+  --stipple-size: 16px;
+  --stipple-color: var(--primary-foreground);
+  --stipple-bg: var(--muted);
+}
+
+.stippled-background {
+  background-image: linear-gradient(
       45deg,
       var(--stipple-color) 25%,
       transparent 25%
@@ -142,4 +145,9 @@ body {
     linear-gradient(-45deg, var(--stipple-color) 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, var(--stipple-color) 75%),
     linear-gradient(-45deg, transparent 75%, var(--stipple-color) 75%);
+  background-size: var(--stipple-size) var(--stipple-size);
+  background-position: 0 0, 0 calc(var(--stipple-size) / 2),
+    calc(var(--stipple-size) / 2) calc(var(--stipple-size) / -2),
+    calc(var(--stipple-size) / -2) 0;
+  background-color: var(--stipple-bg);
 }
