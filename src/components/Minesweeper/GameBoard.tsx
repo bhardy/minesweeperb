@@ -117,6 +117,7 @@ export const GameBoard = ({
   }));
 
   const lastPosition = useRef({ x: 0, y: 0 });
+  const lastScale = useRef(1);
 
   useGesture(
     {
@@ -135,10 +136,15 @@ export const GameBoard = ({
           });
         }
       },
-      onPinch: ({ event, movement: [scale] }) => {
+      onPinch: ({ event, movement: [scale], first }) => {
         const isTouch = (event as PointerEvent).pointerType === "touch";
         if (isMaximized && isTouch) {
-          api.start({ scale, immediate: true });
+          if (first) {
+            // Start from the last known scale
+            lastScale.current = springs.scale.get();
+          }
+          // Multiply the movement with the last scale
+          api.start({ scale: lastScale.current * scale, immediate: true });
         }
       },
     },
@@ -168,8 +174,6 @@ export const GameBoard = ({
         {
           "--rows": gameState.config.height,
           "--cols": gameState.config.width,
-          touchAction: "none",
-          userSelect: "none",
         } as React.CSSProperties
       }
       ref={ref}

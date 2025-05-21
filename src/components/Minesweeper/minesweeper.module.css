@@ -37,6 +37,10 @@
   display: grid;
   flex: 1 0 auto;
   overflow: hidden;
+
+  /* @note these are for useGesture / react-sprign pinch and drag */
+  user-select: none;
+  touch-action: none;
 }
 
 .grid {
@@ -44,10 +48,6 @@
   grid-template-columns: repeat(var(--cols), 24px);
   grid-template-rows: repeat(var(--rows), 24px);
   place-self: center;
-
-  /* @note these are for useGesture / react-sprign pinch and drag */
-  user-select: none;
-  touch-action: none;
 }
 
 /* @note: rows are not styled for web */
