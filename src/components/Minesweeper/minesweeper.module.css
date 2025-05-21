@@ -1,28 +1,80 @@
 .minesweeper {
   display: inline-flex;
   flex-direction: column;
-  border: 2px solid #a4a4a4;
+  border: 2px solid var(--cell-border);
   margin: auto;
   user-select: none;
 
-  --stipple-size: 8px;
-  --stipple-color: #c3c3c3;
-  --stipple-bg: #bbbbbb;
+  /* minesweeper cell colours */
+  --cell: #d6d6d6;
+  --cell-white: color-mix(in srgb, var(--cell) 20%, white);
+  --cell-lightest: color-mix(in srgb, var(--cell) 85%, white);
+  --cell-hover: color-mix(in srgb, var(--cell) 90%, black);
+  --cell-focus: color-mix(in srgb, var(--cell) 85%, black);
+  --cell-revealed: color-mix(in srgb, var(--cell) 80%, black);
+  --cell-border-light: color-mix(in srgb, var(--cell) 75%, black);
+  --cell-border: color-mix(in srgb, var(--cell) 70%, black);
+  --cell-border-dark: color-mix(in srgb, var(--cell) 65%, black);
 
-  --count-1: #0000ff;
-  --count-2: #008000;
-  --count-3: #ff0000;
-  --count-4: #000080;
-  --count-5: #800000;
-  --count-6: #008080;
-  --count-7: #000000;
-  --count-8: #808080;
+  /* mine count numbers */
+  --oklch-lightness: 0.45;
+  --oklch-lightness-muted: 0.05;
+  --oklch-chroma: 0.3;
+  --oklch-alpha: 1;
+
+  /* blue */
+  --mine-count-1: oklch(
+    var(--oklch-lightness) var(--oklch-chroma) 269.75 / var(--oklch-alpha)
+  );
+  /* green */
+  --mine-count-2: oklch(
+    var(--oklch-lightness) var(--oklch-chroma) 142.5 / var(--oklch-alpha)
+  );
+  /* red */
+  --mine-count-3: oklch(
+    var(--oklch-lightness) var(--oklch-chroma) 25 / var(--oklch-alpha)
+  );
+  /* blue */
+  --mine-count-4: oklch(
+    var(--oklch-lightness-muted) var(--oklch-chroma) 269.75 / var(--oklch-alpha)
+  );
+  /* brown */
+  --mine-count-5: oklch(
+    var(--oklch-lightness-muted) var(--oklch-chroma) 60 / var(--oklch-alpha)
+  );
+  /* turqoise */
+  --mine-count-6: oklch(
+    var(--oklch-lightness) var(--oklch-chroma) 180 / var(--oklch-alpha)
+  );
+  /* black */
+  --mine-count-7: oklch(
+    var(--oklch-lightness-muted) var(--oklch-chroma) 269.75 / var(--oklch-alpha)
+  );
+  /* gray */
+  --mine-count-8: oklch(
+    var(--oklch-lightness-muted) var(--oklch-chroma) 142.5 / var(--oklch-alpha)
+  );
+
+  /* background stipple overrides */
+  --stipple-size: 8px;
+  --stipple-color: color-mix(in srgb, var(--cell) 85%, black);
+  --stipple-bg: color-mix(in srgb, var(--cell) 80%, black);
 }
 
 @media (max-width: 768px) {
   .minesweeper {
     margin: 0;
     flex: 1 0 auto;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .minesweeper {
+    /* Dark mode cell colors */
+    --cell: #616161;
+    --cell-white: color-mix(in srgb, var(--cell) 30%, white);
+
+    --oklch-lightness: 0.85;
   }
 }
 
@@ -35,7 +87,7 @@
   display: grid;
   flex: 1 0 auto;
   overflow: hidden;
-  border: 1px solid #bababa;
+  border: 1px solid var(--cell-border-light);
 
   /* @note these are for useGesture / react-sprign pinch and drag */
   user-select: none;
@@ -59,10 +111,10 @@
 .cell {
   position: relative;
   aspect-ratio: 1 / 1;
-  border: 3px solid #ffffff;
-  border-right-color: #919191;
-  border-bottom-color: #919191;
-  background-color: #d6d6d6;
+  border: 3px solid var(--cell-white);
+  border-right-color: var(--cell-border-dark);
+  border-bottom-color: var(--cell-border-dark);
+  background-color: var(--cell);
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -71,14 +123,14 @@
 }
 
 .cell:hover:not(.revealed):not(.flagged) {
-  background-color: #cbcbcb;
+  background-color: var(--cell-hover);
 }
 
 .cell:focus:not(.flagged):not(.revealed) {
-  background-color: #bbbbbb;
+  background-color: var(--cell-revealed);
   border: none;
-  border-top: 2px solid #919191;
-  border-left: 2px solid #919191;
+  border-top: 2px solid var(--cell-border-dark);
+  border-left: 2px solid var(--cell-border-dark);
 }
 
 .cell:focus-visible {
@@ -86,8 +138,8 @@
 }
 
 .cell.revealed {
-  border: 1px solid #919191;
-  background-color: #bbbbbb;
+  border: 1px solid var(--cell-border-dark);
+  background-color: var(--cell-revealed);
 }
 
 .cell.losingClick {
@@ -130,35 +182,35 @@
   transform: translate(-50%, -50%);
   font-size: 14px;
   font-weight: 600;
-  color: var(--count-color, #555);
+  color: var(--mine-count-color, #555);
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
 .count[data-count="1"] {
-  --count-color: var(--count-1);
+  --mine-count-color: var(--mine-count-1);
 }
 .count[data-count="2"] {
-  --count-color: var(--count-2);
+  --mine-count-color: var(--mine-count-2);
 }
 .count[data-count="3"] {
-  --count-color: var(--count-3);
+  --mine-count-color: var(--mine-count-3);
 }
 .count[data-count="4"] {
-  --count-color: var(--count-4);
+  --mine-count-color: var(--mine-count-4);
 }
 .count[data-count="5"] {
-  --count-color: var(--count-5);
+  --mine-count-color: var(--mine-count-5);
 }
 .count[data-count="6"] {
-  --count-color: var(--count-6);
+  --mine-count-color: var(--mine-count-6);
 }
 .count[data-count="7"] {
-  --count-color: var(--count-7);
+  --mine-count-color: var(--mine-count-7);
 }
 .count[data-count="8"] {
-  --count-color: var(--count-8);
+  --mine-count-color: var(--mine-count-8);
 }
 
 .reset {
@@ -167,35 +219,35 @@
   justify-content: center;
   width: 32px;
   aspect-ratio: 1 / 1;
-  border: 4px solid #ffffff;
-  border-right-color: #919191;
-  border-bottom-color: #919191;
-  background-color: #d6d6d6;
-  outline: 1px solid #a4a4a4;
+  border: 4px solid var(--cell-white);
+  border-right-color: var(--cell-border-dark);
+  border-bottom-color: var(--cell-border-dark);
+  background-color: var(--cell);
+  outline: 1px solid var(--cell-border);
 }
 
 .reset:hover {
-  background-color: #cbcbcb;
+  background-color: var(--cell-hover);
 }
 
 .reset:focus {
-  border-color: #c3c3c3;
-  background-color: #c3c3c3;
+  border-color: var(--cell-focus);
+  background-color: var(--cell-focus);
 }
 
 .menu {
   display: flex;
   justify-content: space-between;
-  background-color: #d6d6d6;
+  background-color: var(--cell);
   gap: 2px;
   padding: 4px;
-  border: 1px solid #bababa;
+  border: 1px solid var(--cell-border-light);
 }
 
 .options {
   padding-left: 8px;
   padding-right: 8px;
-  background-color: #e3e3e3;
+  background-color: var(--cell-lightest);
 }
 
 .scoreboard {
