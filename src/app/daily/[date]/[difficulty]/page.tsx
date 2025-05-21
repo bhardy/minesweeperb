@@ -18,11 +18,9 @@ export default function Date({ params }: Props) {
   }
 
   return (
-    <main className="flex min-h-screen font-[family-name:var(--font-geist-sans)]">
+    <main className="flex flex-col flex-1 font-[family-name:var(--font-geist-sans)]">
       <Suspense>
-        <div className="flex flex-1 self-center p-4">
-          <DailyGame date={date} difficulty={difficulty} />
-        </div>
+        <DailyGame date={date} difficulty={difficulty} />
       </Suspense>
     </main>
   );

@@ -11,11 +11,9 @@ export default async function Seed({ params }: Props) {
   const { seed } = await params;
 
   return (
-    <main className="flex min-h-screen font-[family-name:var(--font-geist-sans)]">
+    <main className="flex flex-col flex-1 font-[family-name:var(--font-geist-sans)]">
       <Suspense>
-        <div className="flex flex-1 self-center p-4">
-          <Minesweeper seed={seed[0]} />
-        </div>
+        <Minesweeper seed={seed[0]} />
       </Suspense>
     </main>
   );
