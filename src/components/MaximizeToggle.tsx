@@ -13,7 +13,7 @@ export function MaximizeToggle() {
       size="icon"
       onClick={() => setIsMaximized(!isMaximized)}
       title={isMaximized ? "Minimize" : "Maximize"}
-      className="invisible md:visible"
+      className="invisible md:visible dark:text-foreground"
     >
       {isMaximized ? <Minimize /> : <Maximize />}
     </Button>

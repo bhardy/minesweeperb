@@ -51,7 +51,7 @@ export function Options({ currentDifficulty, setDifficulty }: OptionsProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="block text-xs p-0 h-auto cursor-pointer first-letter:underline hover:bg-transparent hover:underline"
+            className="block text-xs p-0 h-auto cursor-pointer first-letter:underline hover:bg-transparent dark:hover:bg-transparent hover:underline dark:text-foreground"
           >
             Game
           </Button>

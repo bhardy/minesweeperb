@@ -14,6 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useStore, CellAction } from "@/store";
 
 interface SettingsDialogProps {
@@ -56,15 +58,35 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Game Settings</DialogTitle>
-          <DialogDescription>Customize your interactions</DialogDescription>
+          <DialogDescription>
+            Customize your mindsweeping experience. Choose your ideal
+            appearance. Fine-tune your button functionality.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="rounded-lg border p-4">
-            <h3 className="text-md font-medium mb-1">Unrevealed Cells</h3>
+            <h3 className="text-md font-medium mb-1">Appearance</h3>
+            <div className="flex items-center justify-between py-2">
+              <Label className="text-sm">Theme</Label>
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="rounded-lg border p-4">
+            <h3 className="text-md font-medium mb-4">Controls</h3>
+            <p className="text-sm font-normal my-4">
+              You can completely customize what action is fired when you click,
+              right click, left + right click, or hold on a cell. Revealed cells
+              and Unrevealed cells can be tuned to behave differently.
+            </p>
+            <Separator className="my-4" />
+            <h4 className="text-sm font-bold my-4">Unrevealed Cells</h4>
             {renderActionSelect(
               "Left Click / Tap",
               gameSettings.unrevealedCells.leftClick,
@@ -89,10 +111,9 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
               (value) => updateUnrevealedCellSetting("hold", value),
               ["reveal", "flag", "none"]
             )}
-          </div>
 
-          <div className="rounded-lg border p-4">
-            <h3 className="text-md font-medium mb-1">Revealed Cells</h3>
+            <Separator className="my-4" />
+            <h4 className="text-sm font-bold my-4">Revealed Cells</h4>
             {renderActionSelect(
               "Left Click / Tap",
               gameSettings.revealedCells.leftClick,
