@@ -68,9 +68,8 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+:global(.dark) {
   .minesweeper {
-    /* Dark mode cell colors */
     --cell: #616161;
     --cell-white: color-mix(in srgb, var(--cell) 30%, white);
 
