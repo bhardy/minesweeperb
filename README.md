@@ -22,15 +22,15 @@
 - [x] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
 - [x] determine if all menu options should be in the game dropdown or if they should be elsewhere. right now challenges are route based (including difficulty) so the select difficulty drop down is a bit weird. it could be updated so they can be overridden to transition routes
 - [ ] use custom svgs, not emojis
-- [ ] mobile styles -- lock the chrome to the viewport
+- [x] mobile styles -- lock the chrome to the viewport
 - [ ] reveal state after a loss should show incorrect flags
 - [ ] reveal state after a loss shouldn't show bombs in cells with correct flags
-- [ ] update all colors in .minesweeper to use css custom properties
+- [x] update all colors in .minesweeper to use css custom properties
 - [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
 - [ ] supply seed (& link) when game complete
 - [ ] add difficulty tier to seed route
 - [ ] update difficulty settings from daily challenge menu to update the page route
-- [ ] add expanded mode -- mostly for mobile
+- [x] add expanded mode -- mostly for mobile
 - [ ] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
 - [ ] add question marks
 - [x] enable chording on mobile

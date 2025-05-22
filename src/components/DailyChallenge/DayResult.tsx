@@ -18,7 +18,7 @@ export const DayResult = ({ results, date }: DayResultProps) => {
           const result = results[difficulty as keyof AllResults]?.[date];
           return (
             <Link
-              key={difficulty}
+              key={`${date}-${difficulty}`}
               href={`/daily/${date}/${difficulty}`}
               className={classNames(
                 "aspect-square rounded-lg p-4 flex flex-col items-center justify-center text-sm transition-colors",
@@ -29,7 +29,8 @@ export const DayResult = ({ results, date }: DayResultProps) => {
                     result?.status === "won-retry",
                   "bg-red-500 hover:bg-red-600 text-white":
                     result?.status === "lost",
-                  "bg-gray-50 hover:bg-gray-100 text-black": !result,
+                  "bg-card hover:bg-gray-100 dark:hover:bg-gray-800 text-card-foreground":
+                    !result,
                 }
               )}
             >

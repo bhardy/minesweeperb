@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { useStore } from "@/store";
 import { DayResult } from "./DayResult";
+import { Button } from "@/components/ui/button";
 
 interface ChallengeCompleteProps {
   isOpen: boolean;
@@ -40,12 +41,13 @@ export const ChallengeComplete = ({
         </DialogDescription>
         <div className="flex flex-col gap-4">
           <DayResult results={results} date={date} />
-          <button
+          <Button
             onClick={() => onSubmit("")}
-            className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+            variant="default"
+            className="mt-4"
           >
             Close
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

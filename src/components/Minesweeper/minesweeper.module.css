@@ -74,6 +74,7 @@
     --cell-white: color-mix(in srgb, var(--cell) 30%, white);
 
     --oklch-lightness: 0.85;
+    --oklch-lightness-muted: 0.25;
   }
 }
 

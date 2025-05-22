@@ -44,12 +44,12 @@ export const NewBestTime = ({
         </DialogHeader>
         <DialogDescription>
           {seed ? (
-            <span className="text-black">
+            <span className="text-foreground">
               You completed seed <b>{seed}</b> on <b>{difficulty}</b> difficulty{" "}
               in <b>{time}</b> seconds!
             </span>
           ) : (
-            <span className="text-black">
+            <span className="text-foreground">
               You completed <b>{difficulty}</b> difficulty in <b>{time}</b>{" "}
               seconds!
             </span>

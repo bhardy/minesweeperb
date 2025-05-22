@@ -139,15 +139,18 @@ export const ArchiveDialog = ({ isOpen, onClose }: ArchiveDialogProps) => {
                 className={classNames("aspect-square p-1 text-sm color-white", {
                   "opacity-50": !isCurrentMonth,
                   "border-2 border-primary": isCurrentDay,
-                  "bg-green-500 hover:bg-green-600": result?.status === "won",
-                  "bg-blue-500 hover:bg-blue-600":
+                  "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700":
+                    result?.status === "won",
+                  "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700":
                     result?.status === "won-retry",
-                  "bg-red-500 hover:bg-red-600": result?.status === "lost",
+                  "bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700":
+                    result?.status === "lost",
                   "text-white":
                     result?.status === "won" ||
                     result?.status === "lost" ||
                     result?.status === "won-retry",
-                  "bg-gray-100 hover:bg-gray-200": !result,
+                  "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700":
+                    !result,
                   "cursor-not-allowed opacity-30": isFutureDate,
                 })}
               >
