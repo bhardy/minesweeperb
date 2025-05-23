@@ -24,6 +24,7 @@ import {
 } from "./game";
 import { MaximizeToggle } from "@/components/MaximizeToggle";
 import { useStore } from "@/store";
+import { HappyIcon, SadIcon, SunglassesIcon } from "@/components/icons";
 
 type GameAction =
   | { type: "REVEAL_CELL"; payload: { x: number; y: number } }
@@ -36,16 +37,18 @@ function gameReducer(
   state: { gameBoard: GameBoardType; gameState: GameState },
   action: GameAction
 ): { gameBoard: GameBoardType; gameState: GameState } {
+  const isGameOver =
+    state.gameState.status === "won" || state.gameState.status === "lost";
   switch (action.type) {
     case "REVEAL_CELL": {
       const { x, y } = action.payload;
-      if (state.gameState.status === "won") return state;
+      if (isGameOver) return state;
       if (state.gameBoard[y][x].isFlagged) return state;
       return revealCells({ x, y }, state.gameBoard, state.gameState);
     }
     case "TOGGLE_FLAG": {
       const { x, y } = action.payload;
-      if (state.gameState.status === "won") return state;
+      if (isGameOver) return state;
       if (state.gameBoard[y][x].isRevealed) return state;
 
       const newBoard = state.gameBoard.map((row, rowIndex) =>
@@ -281,11 +284,13 @@ export const Minesweeper = ({
           }}
           className={styles.reset}
         >
-          {gameState.status === "won"
-            ? "😎"
-            : gameState.status === "lost"
-            ? "😔"
-            : "🙂"}
+          {gameState.status === "won" ? (
+            <SunglassesIcon />
+          ) : gameState.status === "lost" ? (
+            <SadIcon />
+          ) : (
+            <HappyIcon />
+          )}
         </button>
         <Timer startTime={gameState.startTime} endTime={gameState.endTime} />
       </div>

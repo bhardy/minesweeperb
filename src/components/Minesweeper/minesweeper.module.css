@@ -148,13 +148,20 @@
 
 .icon {
   position: absolute;
+  /* @note: the offset is to account for borders */
+  width: calc(100% - 2px);
+  aspect-ratio: 1 / 1;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 10px;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 @keyframes flagAppear {
