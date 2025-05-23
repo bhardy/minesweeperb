@@ -1,5 +1,5 @@
-export { MineIcon } from "./MineIcon";
-export { FlagIcon } from "./FlagIcon";
-export { HappyIcon } from "./HappyIcon";
-export { SadIcon } from "./SadIcon";
-export { SunglassesIcon } from "./SunglassesIcon";
+export { MineIcon } from "./Mine";
+export { FlagIcon } from "./Flag";
+export { HappyIcon } from "./Happy";
+export { SadIcon } from "./Sad";
+export { SunglassesIcon } from "./Sunglasses";
