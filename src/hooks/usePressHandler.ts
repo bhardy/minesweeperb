@@ -79,6 +79,9 @@ export function usePressHandler({
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
+      // Clear existing timeouts (mostly for multi touch)
+      clearTimeout(timeoutRef.current);
+
       // if the user is holding right click we don't fire the onHold
       if (e.button === 2) {
         isRightClickRef.current = true;

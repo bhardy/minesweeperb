@@ -21,6 +21,7 @@
 - [x] add daily challenge mode, using seeds
 - [x] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
 - [x] determine if all menu options should be in the game dropdown or if they should be elsewhere. right now challenges are route based (including difficulty) so the select difficulty drop down is a bit weird. it could be updated so they can be overridden to transition routes
+- [x] rewrite logic in a reducer
 - [ ] use custom svgs, not emojis
 - [x] mobile styles -- lock the chrome to the viewport
 - [ ] reveal state after a loss should show incorrect flags
@@ -31,7 +32,7 @@
 - [ ] add difficulty tier to seed route
 - [ ] update difficulty settings from daily challenge menu to update the page route
 - [x] add expanded mode -- mostly for mobile
-- [ ] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
+- [x] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
 - [ ] add question marks
 - [x] enable chording on mobile
 - [ ] address accidental flags while moving fast (with mouse)

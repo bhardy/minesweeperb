@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useReducer } from "react";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import { useMediaQuery } from "@react-hook/media-query";
@@ -12,6 +12,7 @@ import { NewBestTime } from "../NewBestTime";
 import type {
   GameBoard as GameBoardType,
   GameState,
+  Level,
 } from "@/types/minesweeper";
 import { DIFFICULTY_LEVELS } from "@/types/constants";
 import {
@@ -23,6 +24,106 @@ import {
 } from "./game";
 import { MaximizeToggle } from "@/components/MaximizeToggle";
 import { useStore } from "@/store";
+
+type GameAction =
+  | { type: "REVEAL_CELL"; payload: { x: number; y: number } }
+  | { type: "TOGGLE_FLAG"; payload: { x: number; y: number } }
+  | { type: "CHORD_CLICK"; payload: { x: number; y: number } }
+  | { type: "RESET_GAME" }
+  | { type: "CHANGE_DIFFICULTY"; payload: { config: Level } };
+
+function gameReducer(
+  state: { gameBoard: GameBoardType; gameState: GameState },
+  action: GameAction
+): { gameBoard: GameBoardType; gameState: GameState } {
+  switch (action.type) {
+    case "REVEAL_CELL": {
+      const { x, y } = action.payload;
+      if (state.gameState.status === "won") return state;
+      if (state.gameBoard[y][x].isFlagged) return state;
+      return revealCells({ x, y }, state.gameBoard, state.gameState);
+    }
+    case "TOGGLE_FLAG": {
+      const { x, y } = action.payload;
+      if (state.gameState.status === "won") return state;
+      if (state.gameBoard[y][x].isRevealed) return state;
+
+      const newBoard = state.gameBoard.map((row, rowIndex) =>
+        row.map((cell, colIndex) =>
+          rowIndex === y && colIndex === x
+            ? { ...cell, isFlagged: !cell.isFlagged }
+            : cell
+        )
+      );
+
+      const newFlagCount = newBoard.reduce(
+        (count, row) =>
+          count +
+          row.reduce(
+            (rowCount, cell) => rowCount + (cell.isFlagged ? 1 : 0),
+            0
+          ),
+        0
+      );
+
+      return {
+        gameBoard: newBoard,
+        gameState: {
+          ...state.gameState,
+          flaggedMines: newFlagCount,
+        },
+      };
+    }
+    case "CHORD_CLICK": {
+      const { x, y } = action.payload;
+      if (!state.gameBoard[y][x].isRevealed) return state;
+      return chordClick({ x, y }, state.gameBoard, state.gameState);
+    }
+    case "RESET_GAME": {
+      const initialGameState = getInitialGameState(
+        state.gameState.config.width,
+        state.gameState.config.height,
+        state.gameState.config,
+        state.gameState.seed
+      );
+      const initialGameBoard = Array.from(
+        { length: state.gameState.config.height },
+        () =>
+          Array.from({ length: state.gameState.config.width }, () => ({
+            isMine: false,
+            isRevealed: false,
+            isFlagged: false,
+            adjacentMines: 0,
+          }))
+      );
+      return {
+        gameBoard: initialGameBoard,
+        gameState: initialGameState,
+      };
+    }
+    case "CHANGE_DIFFICULTY": {
+      const { config } = action.payload;
+      const initialGameState = getInitialGameState(
+        config.width,
+        config.height,
+        config,
+        state.gameState.seed
+      );
+      const initialGameBoard = Array.from({ length: config.height }, () =>
+        Array.from({ length: config.width }, () => ({
+          isMine: false,
+          isRevealed: false,
+          isFlagged: false,
+          adjacentMines: 0,
+        }))
+      );
+      return {
+        gameBoard: initialGameBoard,
+        gameState: initialGameState,
+      };
+    }
+  }
+}
 
 export const Minesweeper = ({
   seed,
@@ -44,8 +145,6 @@ export const Minesweeper = ({
 }) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
-  const [difficulty, setDifficulty] = useState<number>(initialDifficulty ?? 0);
-  const currentConfig = DIFFICULTY_LEVELS[difficulty];
   const { isMaximized, setIsMaximized } = useStore();
   const isSmallScreen = useMediaQuery("(max-width: 768px)");
 
@@ -55,24 +154,30 @@ export const Minesweeper = ({
     }
   }, [isSmallScreen, setIsMaximized]);
 
-  const [gameState, setGameState] = useState<GameState>(() =>
-    getInitialGameState(
-      currentConfig.width,
-      currentConfig.height,
-      currentConfig,
-      seed
-    )
-  );
-
-  const [gameBoard, setGameBoard] = useState<GameBoardType>(() =>
-    Array.from({ length: currentConfig.height }, () =>
-      Array.from({ length: currentConfig.width }, () => ({
+  const initialConfig = DIFFICULTY_LEVELS[initialDifficulty ?? 0];
+  const [{ gameBoard, gameState }, dispatch] = useReducer(gameReducer, {
+    gameBoard: Array.from({ length: initialConfig.height }, () =>
+      Array.from({ length: initialConfig.width }, () => ({
         isMine: false,
         isRevealed: false,
         isFlagged: false,
         adjacentMines: 0,
       }))
-    )
+    ),
+    gameState: getInitialGameState(
+      initialConfig.width,
+      initialConfig.height,
+      initialConfig,
+      seed
+    ),
+  });
+
+  const currentConfig = gameState.config;
+  const currentDifficulty = DIFFICULTY_LEVELS.findIndex(
+    (level) =>
+      level.width === currentConfig.width &&
+      level.height === currentConfig.height &&
+      level.mines === currentConfig.mines
   );
 
   const [showBestTimeDialog, setShowBestTimeDialog] = useState(false);
@@ -81,85 +186,35 @@ export const Minesweeper = ({
   const prevGameStateRef = useRef<GameState | undefined>(undefined);
 
   const resetGame = useCallback(() => {
-    setGameBoard(
-      Array.from({ length: currentConfig.height }, () =>
-        Array.from({ length: currentConfig.width }, () => ({
-          isMine: false,
-          isRevealed: false,
-          isFlagged: false,
-          adjacentMines: 0,
-        }))
-      )
-    );
-    setGameState(
-      getInitialGameState(
-        currentConfig.width,
-        currentConfig.height,
-        currentConfig,
-        seed
-      )
-    );
+    dispatch({ type: "RESET_GAME" });
     setShowBestTimeDialog(false);
     setWinTime(null);
-  }, [currentConfig, seed]);
+  }, []);
+
+  const handleDifficultyChange = useCallback((newDifficulty: number) => {
+    dispatch({
+      type: "CHANGE_DIFFICULTY",
+      payload: {
+        config: DIFFICULTY_LEVELS[newDifficulty],
+      },
+    });
+  }, []);
 
   const handlePrimaryAction = (x: number, y: number) => {
-    if (gameState.status === "won") return;
-    if (gameBoard[y][x].isFlagged) return;
-    const { gameBoard: nextGameBoard, gameState: nextGameState } = revealCells(
-      { x, y },
-      gameBoard,
-      gameState
-    );
-
-    setGameBoard(nextGameBoard);
-    setGameState(nextGameState);
+    dispatch({ type: "REVEAL_CELL", payload: { x, y } });
   };
 
   const handleSecondaryAction = (x: number, y: number) => {
-    if (gameState.status === "won") return;
-    if (gameBoard[y][x].isRevealed) return; // Can't flag revealed cells
-
-    const newBoard = gameBoard.map((row, rowIndex) =>
-      row.map((cell, colIndex) =>
-        rowIndex === y && colIndex === x
-          ? { ...cell, isFlagged: !cell.isFlagged }
-          : cell
-      )
-    );
-
-    const newFlagCount = newBoard.reduce(
-      (count, row) =>
-        count +
-        row.reduce((rowCount, cell) => rowCount + (cell.isFlagged ? 1 : 0), 0),
-      0
-    );
-
-    setGameBoard(newBoard);
-    setGameState((prevState) => ({
-      ...prevState,
-      flaggedMines: newFlagCount,
-    }));
+    dispatch({ type: "TOGGLE_FLAG", payload: { x, y } });
   };
 
   const handleTertiaryAction = (x: number, y: number) => {
-    if (gameBoard[y][x].isRevealed) {
-      const { gameBoard: nextGameBoard, gameState: nextGameState } = chordClick(
-        { x, y },
-        gameBoard,
-        gameState
-      );
-
-      setGameBoard(nextGameBoard);
-      setGameState(nextGameState);
-      return;
-    }
+    dispatch({ type: "CHORD_CLICK", payload: { x, y } });
   };
 
   const handleGameWin = useCallback(
     (time: number) => {
-      const difficulty = currentConfig.name;
-      if (isNewBestTime(difficulty, time)) {
+      if (isNewBestTime(currentConfig.name, time)) {
         setWinTime(time);
         setShowBestTimeDialog(true);
       }
@@ -191,10 +246,6 @@ export const Minesweeper = ({
   };
 
   useEffect(() => {
-    resetGame();
-  }, [difficulty, resetGame]);
-
-  useEffect(() => {
     if (
       (gameState.status === "won" || gameState.status === "lost") &&
       prevGameStateRef.current?.status !== gameState.status
@@ -211,7 +262,10 @@ export const Minesweeper = ({
       })}
     >
       <div className={`${styles.menu} ${styles.options}`}>
-        <Options currentDifficulty={difficulty} setDifficulty={setDifficulty} />
+        <Options
+          currentDifficulty={currentDifficulty}
+          setDifficulty={handleDifficultyChange}
+        />
         <MaximizeToggle />
       </div>
       <div
@@ -243,15 +297,7 @@ export const Minesweeper = ({
         onTertiaryAction={handleTertiaryAction}
       />
       {isDebug && (
-        <pre
-          style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            color: "black",
-          }}
-        >
+        <pre className="fixed bottom-0 left-0 right-0 text-foreground">
           {JSON.stringify(gameState, null, 2)}
         </pre>
       )}
