@@ -38,6 +38,7 @@
 - [ ] address accidental flags while moving fast (with mouse)
 - [ ] address stuck focus state on cells
 - [ ] when holding quick reveal there's sometimes a bug where the user can see the revealed cell and then not reveal it
+- [ ] fix issue where you can still flag after losing
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
