@@ -11,7 +11,7 @@ import { useGesture } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/web";
 import { useRef } from "react";
 import { MineIcon } from "@/components/icons/Mine";
-// import Minesvg from "@/components/icons/svg/mine.svg";
+import { FlagIcon } from "../icons/Flag";
 
 interface CellProps {
   cell: Cell;
@@ -77,11 +77,8 @@ const Cell = ({
       {cell.isRevealed && (
         <>
           {cell.isMine && (
-            // <span className={styles.icon}>{cell.isMine && "💣"}</span>
             <span className={styles.icon}>
-              {/* <MineIcon size={24} /> */}
-              {/* <Minesvg width={12} height={12} /> */}
-              <MineIcon size={12} />
+              <MineIcon />
             </span>
           )}
           {cell.adjacentMines > 0 && (
@@ -92,7 +89,9 @@ const Cell = ({
         </>
       )}
       {cell.isFlagged && (
-        <span className={classNames(styles.icon, styles.flag)}>🚩</span>
+        <span className={classNames(styles.icon, styles.flag)}>
+          <FlagIcon />
+        </span>
       )}
     </button>
   );
