@@ -10,6 +10,8 @@ import { useStore } from "@/store";
 import { useGesture } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/web";
 import { useRef } from "react";
+import { MineIcon } from "@/components/icons/Mine";
+// import Minesvg from "@/components/icons/svg/mine.svg";
 
 interface CellProps {
   cell: Cell;
@@ -75,7 +77,12 @@ const Cell = ({
       {cell.isRevealed && (
         <>
           {cell.isMine && (
-            <span className={styles.icon}>{cell.isMine && "💣"}</span>
+            // <span className={styles.icon}>{cell.isMine && "💣"}</span>
+            <span className={styles.icon}>
+              {/* <MineIcon size={24} /> */}
+              {/* <Minesvg width={12} height={12} /> */}
+              <MineIcon size={12} />
+            </span>
           )}
           {cell.adjacentMines > 0 && (
             <span className={styles.count} data-count={cell.adjacentMines}>
