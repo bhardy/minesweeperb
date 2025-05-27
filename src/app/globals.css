@@ -131,7 +131,7 @@ body {
 /* @todo: update this to use the theme colors */
 /* @note: since this is used on `body` any children will need to override */
 :root {
-  --stipple-size: 16px;
+  --stipple-size: 4px;
   --stipple-color: var(--primary-foreground);
   --stipple-bg: var(--muted);
 }

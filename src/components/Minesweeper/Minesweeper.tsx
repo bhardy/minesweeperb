@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useReducer } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useReducer,
+  useMemo,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import { useMediaQuery } from "@react-hook/media-query";
@@ -175,6 +182,8 @@ export const Minesweeper = ({
     ),
   });
 
+  const memoizedGameBoard = useMemo(() => gameBoard, [gameBoard]);
+
   const currentConfig = gameState.config;
   const currentDifficulty = DIFFICULTY_LEVELS.findIndex(
     (level) =>
@@ -203,17 +212,26 @@ export const Minesweeper = ({
     });
   }, []);
 
-  const handlePrimaryAction = (x: number, y: number) => {
-    dispatch({ type: "REVEAL_CELL", payload: { x, y } });
-  };
+  const handlePrimaryAction = useCallback(
+    (x: number, y: number) => {
+      dispatch({ type: "REVEAL_CELL", payload: { x, y } });
+    },
+    [dispatch]
+  );
 
-  const handleSecondaryAction = (x: number, y: number) => {
-    dispatch({ type: "TOGGLE_FLAG", payload: { x, y } });
-  };
+  const handleSecondaryAction = useCallback(
+    (x: number, y: number) => {
+      dispatch({ type: "TOGGLE_FLAG", payload: { x, y } });
+    },
+    [dispatch]
+  );
 
-  const handleTertiaryAction = (x: number, y: number) => {
-    dispatch({ type: "CHORD_CLICK", payload: { x, y } });
-  };
+  const handleTertiaryAction = useCallback(
+    (x: number, y: number) => {
+      dispatch({ type: "CHORD_CLICK", payload: { x, y } });
+    },
+    [dispatch]
+  );
 
   const handleGameWin = useCallback(
     (time: number) => {
@@ -295,7 +313,7 @@ export const Minesweeper = ({
         <Timer startTime={gameState.startTime} endTime={gameState.endTime} />
       </div>
       <GameBoard
-        gameBoard={gameBoard}
+        gameBoard={memoizedGameBoard}
         gameState={gameState}
         onPrimaryAction={handlePrimaryAction}
         onSecondaryAction={handleSecondaryAction}

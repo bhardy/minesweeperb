@@ -33,6 +33,7 @@
 - [x] address accidental flags while moving fast (with mouse)
 - [x] fix issue where you can still flag after losing
 - [x] add tailwind + darkmode toggle to stories
+- [x] stop unnecessary rerenders of cells
 - [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
 - [ ] supply seed (& link) when game complete
 - [ ] add difficulty tier to seed route
@@ -43,6 +44,7 @@
 - [ ] fix issue where you can't flag fast on mobile
 - [ ] simplify settings
 - [ ] remove click outside to dismiss end-game modals
+- [ ] add keyboard shortcut for new game
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
