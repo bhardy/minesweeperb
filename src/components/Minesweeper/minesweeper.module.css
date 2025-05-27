@@ -272,6 +272,7 @@
   gap: 2px;
   padding: 4px;
   border: 1px solid var(--cell-border-light);
+  min-height: 46px;
 }
 
 .options {

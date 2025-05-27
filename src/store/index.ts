@@ -98,6 +98,8 @@ interface AppState {
   // Maximize State
   isMaximized: boolean;
   setIsMaximized: (isMaximized: boolean) => void;
+  userPrefersMaximized: boolean | null;
+  setUserPrefersMaximized: (prefers: boolean) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -178,6 +180,9 @@ export const useStore = create<AppState>()(
       // Maximize State
       isMaximized: false,
       setIsMaximized: (isMaximized) => set({ isMaximized }),
+      userPrefersMaximized: null,
+      setUserPrefersMaximized: (prefers) =>
+        set({ userPrefersMaximized: prefers }),
     }),
     {
       name: "minesweeper-storage",
@@ -186,7 +191,7 @@ export const useStore = create<AppState>()(
         latestUsername: state.latestUsername,
         gameSettings: state.gameSettings,
         bestTimes: state.bestTimes,
-        isMaximized: state.isMaximized,
+        userPrefersMaximized: state.userPrefersMaximized,
       }),
     }
   )
