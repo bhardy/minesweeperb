@@ -22,25 +22,27 @@
 - [x] the win state should be composable (NewBestTime will become very gross very fast) - right now this shows a seed message on daily challenge win
 - [x] determine if all menu options should be in the game dropdown or if they should be elsewhere. right now challenges are route based (including difficulty) so the select difficulty drop down is a bit weird. it could be updated so they can be overridden to transition routes
 - [x] rewrite logic in a reducer
-- [ ] use custom svgs, not emojis
+- [x] use custom svgs, not emojis
 - [x] mobile styles -- lock the chrome to the viewport
-- [ ] reveal state after a loss should show incorrect flags
-- [ ] reveal state after a loss shouldn't show bombs in cells with correct flags
+- [x] reveal state after a loss should show incorrect flags
+- [x] reveal state after a loss shouldn't show bombs in cells with correct flags
 - [x] update all colors in .minesweeper to use css custom properties
+- [x] add expanded mode -- mostly for mobile
+- [x] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
+- [x] enable chording on mobile
+- [x] address accidental flags while moving fast (with mouse)
+- [x] fix issue where you can still flag after losing
+- [x] add tailwind + darkmode toggle to stories
 - [ ] adjust mine generation to always use a seed -- if one isn't passed it should generate the seed first (random string?)
 - [ ] supply seed (& link) when game complete
 - [ ] add difficulty tier to seed route
 - [ ] update difficulty settings from daily challenge menu to update the page route
-- [x] add expanded mode -- mostly for mobile
-- [x] fix multi touch issue where you can accidentally flag if both fingers don't touch at exactly the same time
 - [ ] add question marks
-- [x] enable chording on mobile
-- [ ] address accidental flags while moving fast (with mouse)
 - [ ] address stuck focus state on cells
 - [ ] when holding quick reveal there's sometimes a bug where the user can see the revealed cell and then not reveal it
-- [x] fix issue where you can still flag after losing
-- [x] add tailwind + darkmode toggle to stories
 - [ ] fix issue where you can't flag fast on mobile
+- [ ] simplify settings
+- [ ] remove click outside to dismiss end-game modals
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

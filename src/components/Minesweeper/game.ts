@@ -281,11 +281,12 @@ export const revealCells = (
     );
   }
 
+  // @note: this is where we set up the lose state by revealing mines and incorrect flags
   if (gameBoard[y][x].isMine) {
     // Reveal all mines if user clicked a mine
     const revealedBoard = gameBoard.map((row) =>
       row.map((cell) => {
-        if (cell.isMine) {
+        if (cell.isMine || (!cell.isMine && cell.isFlagged)) {
           return { ...cell, isRevealed: true };
         }
         return cell;

@@ -9,7 +9,7 @@ import { usePressHandler } from "@/hooks/usePressHandler";
 import { useStore } from "@/store";
 import { useGesture } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/web";
-import { useRef } from "react";
+import { useRef, memo } from "react";
 import { MineIcon } from "@/components/icons/Mine";
 import { FlagIcon } from "../icons/Flag";
 
@@ -22,6 +22,50 @@ interface CellProps {
   onTertiaryAction: (x: number, y: number) => void;
   lastClick?: { x: number; y: number };
 }
+
+const CellContent = memo(({ cell }: { cell: Cell }) => {
+  if (cell.isRevealed) {
+    if (cell.isMine && cell.isFlagged) {
+      return (
+        <span className={styles.icon}>
+          <FlagIcon />
+        </span>
+      );
+    }
+    if (cell.isMine) {
+      return (
+        <span className={styles.icon}>
+          <MineIcon />
+        </span>
+      );
+    }
+    if (cell.isFlagged) {
+      return (
+        <span className={classNames(styles.icon, styles.incorrectFlag)}>
+          <FlagIcon />
+        </span>
+      );
+    }
+    if (cell.adjacentMines > 0) {
+      return (
+        <span className={styles.count} data-count={cell.adjacentMines}>
+          {cell.adjacentMines}
+        </span>
+      );
+    }
+    return null;
+  }
+  if (cell.isFlagged) {
+    return (
+      <span className={styles.icon}>
+        <FlagIcon />
+      </span>
+    );
+  }
+  return null;
+});
+
+CellContent.displayName = "CellContent";
 
 const Cell = ({
   cell,
@@ -74,25 +118,7 @@ const Cell = ({
       })}
       {...pressHandlerProps}
     >
-      {cell.isRevealed && (
-        <>
-          {cell.isMine && (
-            <span className={styles.icon}>
-              <MineIcon />
-            </span>
-          )}
-          {cell.adjacentMines > 0 && (
-            <span className={styles.count} data-count={cell.adjacentMines}>
-              {cell.adjacentMines > 0 && cell.adjacentMines}
-            </span>
-          )}
-        </>
-      )}
-      {cell.isFlagged && (
-        <span className={classNames(styles.icon, styles.flag)}>
-          <FlagIcon />
-        </span>
-      )}
+      <CellContent cell={cell} />
     </button>
   );
 };
