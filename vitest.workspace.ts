@@ -19,6 +19,8 @@ const projects: TestProjectInlineConfiguration[] = [
       globals: true,
       setupFiles: ["./src/test/setup.ts"],
       include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+      exclude: ["**/node_modules/**", "**/dist/**"],
+      root: dirname,
     },
   },
 ];
@@ -40,6 +42,7 @@ if (process.env.STORYBOOK_TESTS === "true") {
       environment: "jsdom",
       globals: true,
       setupFiles: [".storybook/vitest.setup.ts"],
+      root: dirname,
     },
   });
 }
