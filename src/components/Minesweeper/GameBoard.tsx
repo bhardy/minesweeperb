@@ -57,7 +57,7 @@ const CellContent = memo(({ cell }: { cell: Cell }) => {
   }
   if (cell.isFlagged) {
     return (
-      <span className={styles.icon}>
+      <span className={classNames(styles.icon, styles.flag)}>
         <FlagIcon />
       </span>
     );

@@ -201,6 +201,7 @@
   .flag {
     z-index: 1;
     animation: flagAppear 0.2s ease-out;
+    pointer-events: none;
   }
 }
 
