@@ -27,9 +27,42 @@ export interface CellSettings {
 }
 
 export interface GameSettings {
+  controlMode: "basic" | "custom";
   unrevealedCells: CellSettings;
   revealedCells: CellSettings;
 }
+
+const getDefaultTouchSettings = (): GameSettings => ({
+  controlMode: "basic",
+  unrevealedCells: {
+    leftClick: "reveal",
+    rightClick: "none",
+    leftRightClick: "none",
+    hold: "flag",
+  },
+  revealedCells: {
+    leftClick: "quick-reveal",
+    rightClick: "none",
+    leftRightClick: "none",
+    hold: "none",
+  },
+});
+
+const getDefaultNonTouchSettings = (): GameSettings => ({
+  controlMode: "basic",
+  unrevealedCells: {
+    leftClick: "reveal",
+    rightClick: "flag",
+    leftRightClick: "none",
+    hold: "none",
+  },
+  revealedCells: {
+    leftClick: "quick-reveal",
+    rightClick: "none",
+    leftRightClick: "none",
+    hold: "none",
+  },
+});
 
 interface AppState {
   // Daily Challenge Results
@@ -53,6 +86,8 @@ interface AppState {
     action: keyof CellSettings,
     value: CellAction
   ) => void;
+  setControlMode: (mode: "basic" | "custom") => void;
+  resetToDefaultSettings: () => void;
 
   // Best Times
   bestTimes: BestTimes;
@@ -82,20 +117,7 @@ export const useStore = create<AppState>()(
       setLatestUsername: (name) => set({ latestUsername: name }),
 
       // Game Settings
-      gameSettings: {
-        unrevealedCells: {
-          leftClick: "reveal",
-          rightClick: "flag",
-          leftRightClick: "none",
-          hold: "flag",
-        },
-        revealedCells: {
-          leftClick: "none",
-          rightClick: "none",
-          leftRightClick: "quick-reveal",
-          hold: "none",
-        },
-      },
+      gameSettings: getDefaultNonTouchSettings(),
       setGameSettings: (settings) => set({ gameSettings: settings }),
       updateUnrevealedCellSetting: (action, value) =>
         set((state) => ({
@@ -117,6 +139,21 @@ export const useStore = create<AppState>()(
             },
           },
         })),
+      setControlMode: (mode) =>
+        set((state) => ({
+          gameSettings: {
+            ...state.gameSettings,
+            controlMode: mode,
+          },
+        })),
+      resetToDefaultSettings: () => {
+        const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+        set({
+          gameSettings: isTouchDevice
+            ? getDefaultTouchSettings()
+            : getDefaultNonTouchSettings(),
+        });
+      },
 
       // Best Times
       bestTimes: {},

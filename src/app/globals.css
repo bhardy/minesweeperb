@@ -132,8 +132,13 @@ body {
 /* @note: since this is used on `body` any children will need to override */
 :root {
   --stipple-size: 4px;
-  --stipple-color: var(--primary-foreground);
-  --stipple-bg: var(--muted);
+  --stipple-color: oklch(0.985 0 247.839);
+  --stipple-bg: oklch(0.967 0 264.542);
+}
+
+.dark {
+  --stipple-color: oklch(0.21 0 264.665);
+  --stipple-bg: oklch(0.278 0 256.848);
 }
 
 .stippled-background {
