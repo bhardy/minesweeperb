@@ -37,6 +37,7 @@
 - [x] fix issue where you can't flag fast on mobile
 - [x] simplify settings (cleaner defaults for mobile and desktop, advanced options as opt-in)
 - [ ] add toggle for quick-flag mode
+- [ ] the shift caused by userPrefersMaximized is ugly, fetch settings before displaying <Minesweeper> to remove FOUC
 - [ ] remove click outside to dismiss end-game modals
 - [ ] add keyboard shortcut for new game
 - [ ] improve pinch/pan on mobile so that it scales between the users fingers
