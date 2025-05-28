@@ -33,4 +33,8 @@ export const GAME_MODES = [
     name: "Daily Challenge",
     value: "daily",
   },
+  {
+    name: "Interactive Tutorial",
+    value: "tutorial",
+  },
 ];
