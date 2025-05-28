@@ -273,11 +273,11 @@ export const Minesweeper = ({
 
   return (
     <div
-      className={classNames(styles.minesweeper, "stippled-background", {
+      className={classNames(styles.minesweeper, {
         [styles.quickFlagMode]: gameSettings.quickFlagMode,
       })}
     >
-      <div className={`${styles.menu} ${styles.options}`}>
+      <div className={`${styles.options}`}>
         <Options
           currentDifficulty={currentDifficulty}
           setDifficulty={handleDifficultyChange}
@@ -286,7 +286,7 @@ export const Minesweeper = ({
         />
       </div>
       <div
-        className={classNames(styles.menu, {
+        className={classNames(styles.jumbotron, {
           [styles.victory]: gameState.status === "won",
         })}
       >

@@ -1,18 +1,18 @@
 .minesweeper {
   display: inline-flex;
   flex-direction: column;
+  gap: 8px;
   border: 2px solid var(--cell-border);
   margin: auto;
   user-select: none;
 
   /* minesweeper cell colours */
   --cell: #d6d6d6;
-  --cell-white: color-mix(in srgb, var(--cell) 20%, white);
   --cell-lightest: color-mix(in srgb, var(--cell) 85%, white);
   --cell-hover: color-mix(in srgb, var(--cell) 90%, black);
   --cell-focus: color-mix(in srgb, var(--cell) 85%, black);
   --cell-revealed: color-mix(in srgb, var(--cell) 80%, black);
-  --cell-border-light: color-mix(in srgb, var(--cell) 75%, black);
+  --cell-border-light: color-mix(in srgb, var(--cell) 50%, white);
   --cell-border: color-mix(in srgb, var(--cell) 70%, black);
   --cell-border-dark: color-mix(in srgb, var(--cell) 65%, black);
 
@@ -61,6 +61,12 @@
   --stipple-bg: color-mix(in srgb, var(--cell) 80%, black);
 
   --losing-color: #ff0000dc;
+
+  padding: 8px;
+  border: 4px solid var(--cell-border-light);
+  border-right-color: var(--cell-border-dark);
+  border-bottom-color: var(--cell-border-dark);
+  background-color: var(--cell);
 }
 
 @media (pointer: coarse) {
@@ -73,20 +79,31 @@
 :global(.dark) {
   .minesweeper {
     --cell: #616161;
-    --cell-white: color-mix(in srgb, var(--cell) 30%, white);
 
     --oklch-lightness: 0.85;
     --oklch-lightness-muted: 0.25;
   }
 }
 
+.minesweeper * {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
 .board {
   display: grid;
   flex: 1 0 auto;
   overflow: hidden;
-  border: 1px solid var(--cell-border-light);
 
-  /* @note these are for useGesture / react-sprign pinch and drag */
+  border: 4px solid var(--cell-border-dark);
+  border-right-color: var(--cell-border-light);
+  border-bottom-color: var(--cell-border-light);
+  background-color: var(--cell);
+
+  /* @note these are required for useGesture / react-spring pinch and drag */
   user-select: none;
   touch-action: none;
 }
@@ -108,14 +125,10 @@
 .cell {
   position: relative;
   aspect-ratio: 1 / 1;
-  border: 3px solid var(--cell-white);
+  border: 3px solid var(--cell-border-light);
   border-right-color: var(--cell-border-dark);
   border-bottom-color: var(--cell-border-dark);
   background-color: var(--cell);
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
   outline: none;
 }
 
@@ -171,9 +184,6 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 
 .icon svg {
@@ -228,9 +238,6 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--mine-count-color, #555);
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 
 .count[data-count="1"] {
@@ -264,7 +271,7 @@
   justify-content: center;
   width: 32px;
   aspect-ratio: 1 / 1;
-  border: 4px solid var(--cell-white);
+  border: 3px solid var(--cell-border-light);
   border-right-color: var(--cell-border-dark);
   border-bottom-color: var(--cell-border-dark);
   background-color: var(--cell);
@@ -280,19 +287,20 @@
   background-color: var(--cell-focus);
 }
 
-.menu {
-  display: flex;
-  justify-content: space-between;
-  background-color: var(--cell);
-  gap: 2px;
-  padding: 4px;
-  border: 1px solid var(--cell-border-light);
+.options {
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
-.options {
-  padding-left: 8px;
-  padding-right: 8px;
-  background-color: var(--cell-lightest);
+.jumbotron {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+  padding: 6px;
+  border: 4px solid var(--cell-border-dark);
+  border-right-color: var(--cell-border-light);
+  border-bottom-color: var(--cell-border-light);
+  background-color: var(--cell);
 }
 
 .scoreboard {

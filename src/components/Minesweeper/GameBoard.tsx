@@ -243,7 +243,7 @@ export const GameBoard = memo(
 
     return (
       <div
-        className={styles.board}
+        className={classNames(styles.board, "stippled-background")}
         style={
           {
             "--rows": gameState.config.height,
