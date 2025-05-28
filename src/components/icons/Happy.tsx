@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import HappySvg from "./svg/happy.svg";
+import HappySvg from "@/public/icons/happy.svg";
 
 export const HappyIcon = ({
   size = 24,
