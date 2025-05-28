@@ -63,7 +63,7 @@
   --losing-color: #ff0000dc;
 }
 
-@media (max-width: 768px) {
+@media (pointer: coarse) {
   .minesweeper {
     margin: 0;
     flex: 1 0 auto;
@@ -78,11 +78,6 @@
     --oklch-lightness: 0.85;
     --oklch-lightness-muted: 0.25;
   }
-}
-
-.minesweeper.maximized {
-  margin: 0;
-  flex: 1 0 auto;
 }
 
 .board {
@@ -197,7 +192,7 @@
   }
 }
 
-@media (hover: none) {
+@media (pointer: coarse) {
   .flag {
     z-index: 1;
     animation: flagAppear 0.2s ease-out;

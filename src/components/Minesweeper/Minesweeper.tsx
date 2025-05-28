@@ -28,8 +28,6 @@ import {
   saveBestTime,
   chordClick,
 } from "./game";
-import { MaximizeToggle } from "@/components/MaximizeToggle";
-import { useStore } from "@/store";
 import { HappyIcon, SadIcon, SunglassesIcon } from "@/components/icons";
 
 type GameAction =
@@ -154,9 +152,6 @@ export const Minesweeper = ({
 }) => {
   const searchParams = useSearchParams();
   const isDebug = searchParams.has("debug");
-  const { isMaximized } = useStore();
-
-  console.log("isMaximized", isMaximized);
 
   const initialConfig = DIFFICULTY_LEVELS[initialDifficulty ?? 0];
   const [{ gameBoard, gameState }, dispatch] = useReducer(gameReducer, {
@@ -271,17 +266,12 @@ export const Minesweeper = ({
   }, [gameState, onGameEnd]);
 
   return (
-    <div
-      className={classNames(styles.minesweeper, "stippled-background", {
-        [styles.maximized]: isMaximized,
-      })}
-    >
+    <div className={classNames(styles.minesweeper, "stippled-background")}>
       <div className={`${styles.menu} ${styles.options}`}>
         <Options
           currentDifficulty={currentDifficulty}
           setDifficulty={handleDifficultyChange}
         />
-        <MaximizeToggle />
       </div>
       <div
         className={classNames(styles.menu, {
