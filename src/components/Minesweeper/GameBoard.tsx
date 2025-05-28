@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import styles from "./minesweeper.module.css";
+import { useMediaQuery } from "@react-hook/media-query";
 import type {
   GameBoard as GameBoardType,
   GameState,
@@ -11,7 +11,8 @@ import { useGesture } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/web";
 import { useRef, memo, useCallback, useMemo } from "react";
 import { MineIcon } from "@/components/icons/Mine";
-import { FlagIcon } from "../icons/Flag";
+import { FlagIcon } from "@/components/icons/Flag";
+import styles from "./minesweeper.module.css";
 
 interface CellProps {
   cell: Cell;
@@ -145,7 +146,7 @@ export const GameBoard = memo(
     onSecondaryAction,
     onTertiaryAction,
   }: GameBoardProps) => {
-    const { isMaximized } = useStore();
+    const isMaximized = useMediaQuery("(pointer: coarse)");
     const ref = useRef<HTMLDivElement>(null);
 
     const [springs, api] = useSpring(() => ({
@@ -183,27 +184,27 @@ export const GameBoard = memo(
 
     useGesture(
       {
+        // @note: these pointerType checks may not be necessary since we are
+        // also checking the pointer type with `isMaximized`
         onDrag: ({ event, movement: [x, y], first }) => {
-          const isTouch = (event as PointerEvent).pointerType === "touch";
-          if (isMaximized && isTouch) {
-            if (first) {
-              lastPosition.current = { x: springs.x.get(), y: springs.y.get() };
-            }
-            api.start({
-              x: lastPosition.current.x + x,
-              y: lastPosition.current.y + y,
-              immediate: true,
-            });
+          if ((event as PointerEvent).pointerType !== "touch") return;
+
+          if (first) {
+            lastPosition.current = { x: springs.x.get(), y: springs.y.get() };
           }
+          api.start({
+            x: lastPosition.current.x + x,
+            y: lastPosition.current.y + y,
+            immediate: true,
+          });
         },
         onPinch: ({ event, movement: [scale], first }) => {
-          const isTouch = (event as PointerEvent).pointerType === "touch";
-          if (isMaximized && isTouch) {
-            if (first) {
-              lastScale.current = springs.scale.get();
-            }
-            api.start({ scale: lastScale.current * scale, immediate: true });
+          if ((event as PointerEvent).pointerType !== "touch") return;
+
+          if (first) {
+            lastScale.current = springs.scale.get();
           }
+          api.start({ scale: lastScale.current * scale, immediate: true });
         },
       },
       {
@@ -236,10 +237,7 @@ export const GameBoard = memo(
         }
         ref={ref}
       >
-        <animated.div
-          className={styles.grid}
-          style={isMaximized ? springs : undefined}
-        >
+        <animated.div className={styles.grid} style={springs}>
           {memoizedGameBoard.map((row, y) => (
             <div key={y} className={styles.row}>
               {row.map((cell, x) => (
