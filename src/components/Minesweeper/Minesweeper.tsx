@@ -8,7 +8,6 @@ import {
   useReducer,
   useMemo,
 } from "react";
-import { useSearchParams } from "next/navigation";
 import classNames from "classnames";
 import styles from "./minesweeper.module.css";
 import { Options } from "../Options";
@@ -29,6 +28,7 @@ import {
   chordClick,
 } from "./game";
 import { HappyIcon, SadIcon, SunglassesIcon } from "@/components/icons";
+import { useStore } from "@/store";
 
 type GameAction =
   | { type: "REVEAL_CELL"; payload: { x: number; y: number } }
@@ -150,8 +150,7 @@ export const Minesweeper = ({
     seed?: string;
   }>;
 }) => {
-  const searchParams = useSearchParams();
-  const isDebug = searchParams.has("debug");
+  const { gameSettings, setQuickFlagMode } = useStore();
 
   const initialConfig = DIFFICULTY_LEVELS[initialDifficulty ?? 0];
   const [{ gameBoard, gameState }, dispatch] = useReducer(gameReducer, {
@@ -271,6 +270,8 @@ export const Minesweeper = ({
         <Options
           currentDifficulty={currentDifficulty}
           setDifficulty={handleDifficultyChange}
+          gameSettings={gameSettings}
+          setQuickFlagMode={setQuickFlagMode}
         />
       </div>
       <div
@@ -303,11 +304,6 @@ export const Minesweeper = ({
         onSecondaryAction={handleSecondaryAction}
         onTertiaryAction={handleTertiaryAction}
       />
-      {isDebug && (
-        <pre className="fixed bottom-0 left-0 right-0 text-foreground">
-          {JSON.stringify(gameState, null, 2)}
-        </pre>
-      )}
       {WinDialog ? (
         <WinDialog
           isOpen={showBestTimeDialog}
