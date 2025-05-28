@@ -28,12 +28,14 @@ export interface CellSettings {
 
 export interface GameSettings {
   controlMode: "basic" | "custom";
+  quickFlagMode: boolean;
   unrevealedCells: CellSettings;
   revealedCells: CellSettings;
 }
 
 const getDefaultTouchSettings = (): GameSettings => ({
   controlMode: "basic",
+  quickFlagMode: false,
   unrevealedCells: {
     leftClick: "reveal",
     rightClick: "none",
@@ -48,8 +50,9 @@ const getDefaultTouchSettings = (): GameSettings => ({
   },
 });
 
-const getDefaultNonTouchSettings = (): GameSettings => ({
+const getDefaultMouseSettings = (): GameSettings => ({
   controlMode: "basic",
+  quickFlagMode: false,
   unrevealedCells: {
     leftClick: "reveal",
     rightClick: "flag",
@@ -87,6 +90,7 @@ interface AppState {
     value: CellAction
   ) => void;
   setControlMode: (mode: "basic" | "custom") => void;
+  setQuickFlagMode: (enabled: boolean) => void;
   resetToDefaultSettings: () => void;
 
   // Best Times
@@ -113,7 +117,7 @@ export const useStore = create<AppState>()(
       setLatestUsername: (name) => set({ latestUsername: name }),
 
       // Game Settings
-      gameSettings: getDefaultNonTouchSettings(),
+      gameSettings: getDefaultMouseSettings(),
       setGameSettings: (settings) => set({ gameSettings: settings }),
       updateUnrevealedCellSetting: (action, value) =>
         set((state) => ({
@@ -140,6 +144,15 @@ export const useStore = create<AppState>()(
           gameSettings: {
             ...state.gameSettings,
             controlMode: mode,
+            quickFlagMode:
+              mode === "custom" ? false : state.gameSettings.quickFlagMode,
+          },
+        })),
+      setQuickFlagMode: (enabled) =>
+        set((state) => ({
+          gameSettings: {
+            ...state.gameSettings,
+            quickFlagMode: enabled,
           },
         })),
       resetToDefaultSettings: () => {
@@ -147,7 +160,7 @@ export const useStore = create<AppState>()(
         set({
           gameSettings: isTouchDevice
             ? getDefaultTouchSettings()
-            : getDefaultNonTouchSettings(),
+            : getDefaultMouseSettings(),
         });
       },
 

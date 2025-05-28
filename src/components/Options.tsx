@@ -3,6 +3,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { useRouter, usePathname } from "next/navigation";
+import { useMediaQuery } from "@react-hook/media-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,17 +26,26 @@ import { RecordsDialog } from "./RecordsDialog";
 import { SettingsDialog } from "./SettingsDialog";
 import { ArchiveDialog } from "./DailyChallenge/ArchiveDialog";
 import { DailyStatusDialog } from "./DailyChallenge/DailyStatusDialog";
+import type { GameSettings } from "@/store";
 
 interface OptionsProps {
   currentDifficulty: number;
   setDifficulty: (difficulty: number) => void;
+  gameSettings: GameSettings;
+  setQuickFlagMode: (mode: boolean) => void;
 }
 
-export function Options({ currentDifficulty, setDifficulty }: OptionsProps) {
+export function Options({
+  currentDifficulty,
+  setDifficulty,
+  gameSettings,
+  setQuickFlagMode,
+}: OptionsProps) {
   const [recordsOpen, setRecordsOpen] = React.useState(false);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [archiveOpen, setArchiveOpen] = React.useState(false);
   const [dailyStatusOpen, setDailyStatusOpen] = React.useState(false);
+  const isTouchDevice = useMediaQuery("(pointer: coarse)");
 
   const router = useRouter();
   const pathname = usePathname();
@@ -51,7 +61,7 @@ export function Options({ currentDifficulty, setDifficulty }: OptionsProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="block text-xs p-0 h-auto cursor-pointer first-letter:underline hover:bg-transparent dark:hover:bg-transparent hover:underline dark:text-foreground"
+            className="block text-xs px-0 py-1 h-auto cursor-pointer first-letter:underline hover:bg-transparent dark:hover:bg-transparent hover:underline dark:text-foreground"
           >
             Game
           </Button>
@@ -68,6 +78,29 @@ export function Options({ currentDifficulty, setDifficulty }: OptionsProps) {
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
+          {isTouchDevice && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Flag Mode</DropdownMenuLabel>
+              {gameSettings.controlMode === "custom" ? (
+                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  Disabled while using Custom Controls
+                </DropdownMenuLabel>
+              ) : (
+                <DropdownMenuRadioGroup
+                  value={gameSettings.quickFlagMode ? "quick" : "normal"}
+                  onValueChange={(value) => setQuickFlagMode(value === "quick")}
+                >
+                  <DropdownMenuRadioItem value="normal">
+                    Normal
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="quick">
+                    Quick Flag
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              )}
+            </>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Game Mode</DropdownMenuLabel>
           <DropdownMenuRadioGroup

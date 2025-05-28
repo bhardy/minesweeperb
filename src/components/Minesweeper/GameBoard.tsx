@@ -100,11 +100,20 @@ const Cell = memo(
       }
     };
 
+    // For unrevealed cells in quick flag mode, flip left click and hold actions
+    const getAction = (action: string) => {
+      if (!cell.isRevealed && gameSettings.quickFlagMode) {
+        if (action === "reveal") return "flag";
+        if (action === "flag") return "reveal";
+      }
+      return action;
+    };
+
     const { ...pressHandlerProps } = usePressHandler({
-      onClick: () => handleAction(settings.leftClick),
+      onClick: () => handleAction(getAction(settings.leftClick)),
       onHold:
         settings.hold !== "none"
-          ? () => handleAction(settings.hold)
+          ? () => handleAction(getAction(settings.hold))
           : undefined,
       onRightClick: () => handleAction(settings.rightClick),
       onLeftAndRightClick: () => handleAction(settings.leftRightClick),

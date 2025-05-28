@@ -37,8 +37,9 @@
 - [x] fix issue where you can't flag fast on mobile
 - [x] simplify settings (cleaner defaults for mobile and desktop, advanced options as opt-in)
 - [x] remove maximize toggle (temporary?)
-- [ ] add toggle for quick-flag mode
-- [ ] re-enable isMaximized toggle (removed in 141645e627c53e70d5f7084e9c8e5b3d603643b0) but fix the layout shift after local storage hydration
+- [x] add toggle for quick-flag mode
+- [ ] add tutorial mode
+- [ ] re-enable isMaximized toggle (removed in ad0e926) but fix the layout shift after local storage hydration
 - [ ] remove click outside to dismiss end-game modals
 - [ ] add keyboard shortcut for new game
 - [ ] improve pinch/pan on mobile so that it scales between the users fingers
