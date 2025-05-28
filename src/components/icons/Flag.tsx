@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import FlagSvg from "./svg/flag.svg";
+import FlagSvg from "@/public/icons/flag.svg";
 
 export const FlagIcon = ({
   size = 24,

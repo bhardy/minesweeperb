@@ -29,6 +29,7 @@ import {
 } from "./game";
 import { HappyIcon, SadIcon, SunglassesIcon } from "@/components/icons";
 import { useStore } from "@/store";
+import { useMediaQuery } from "@react-hook/media-query";
 
 type GameAction =
   | { type: "REVEAL_CELL"; payload: { x: number; y: number } }
@@ -150,7 +151,7 @@ export const Minesweeper = ({
     seed?: string;
   }>;
 }) => {
-  const { gameSettings, setQuickFlagMode } = useStore();
+  const { gameSettings, setQuickFlagMode, resetToDefaultSettings } = useStore();
 
   const initialConfig = DIFFICULTY_LEVELS[initialDifficulty ?? 0];
   const [{ gameBoard, gameState }, dispatch] = useReducer(gameReducer, {
@@ -264,8 +265,18 @@ export const Minesweeper = ({
     prevGameStateRef.current = gameState;
   }, [gameState, onGameEnd]);
 
+  // @note: this is mostly just for development as this can only really happen if the user toggles settings in dev tools
+  const isTouchDevice = useMediaQuery("(pointer: coarse)");
+  useEffect(() => {
+    resetToDefaultSettings();
+  }, [isTouchDevice, resetToDefaultSettings]);
+
   return (
-    <div className={classNames(styles.minesweeper, "stippled-background")}>
+    <div
+      className={classNames(styles.minesweeper, "stippled-background", {
+        [styles.quickFlagMode]: gameSettings.quickFlagMode,
+      })}
+    >
       <div className={`${styles.menu} ${styles.options}`}>
         <Options
           currentDifficulty={currentDifficulty}

@@ -143,6 +143,26 @@
   background-color: var(--losing-color);
 }
 
+.quickFlagMode .cell:not(.revealed):not(.flagged)::before {
+  --flag-opacity: 0.2;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/icons/flag.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: calc(100% - 2px);
+  filter: saturate(0) brightness(1.1);
+  opacity: 0.2;
+}
+
+:global(.dark) {
+  .quickFlagMode .cell:not(.revealed):not(.flagged)::before {
+    filter: saturate(0) brightness(1.7);
+    opacity: 0.3;
+  }
+}
+
 .icon {
   position: absolute;
   /* @note: the offset is to account for borders */

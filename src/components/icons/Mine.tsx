@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import MineSvg from "./svg/mine.svg";
+import MineSvg from "@/public/icons/mine.svg";
 
 export const MineIcon = ({
   size = 24,

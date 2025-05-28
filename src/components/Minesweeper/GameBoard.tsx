@@ -9,7 +9,7 @@ import { usePressHandler } from "@/hooks/usePressHandler";
 import { useStore } from "@/store";
 import { useGesture } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/web";
-import { useRef, memo, useCallback, useMemo } from "react";
+import { useRef, memo, useCallback, useMemo, useState, useEffect } from "react";
 import { MineIcon } from "@/components/icons/Mine";
 import { FlagIcon } from "@/components/icons/Flag";
 import styles from "./minesweeper.module.css";
@@ -156,7 +156,13 @@ export const GameBoard = memo(
     onTertiaryAction,
   }: GameBoardProps) => {
     const isMaximized = useMediaQuery("(pointer: coarse)");
+    const [mounted, setMounted] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+
+    // @note: this is a workaround to address the hydration mismatch on the animated.div
+    useEffect(() => {
+      setMounted(true);
+    }, []);
 
     const [springs, api] = useSpring(() => ({
       x: 0,
@@ -246,7 +252,10 @@ export const GameBoard = memo(
         }
         ref={ref}
       >
-        <animated.div className={styles.grid} style={springs}>
+        <animated.div
+          className={styles.grid}
+          style={mounted && isMaximized ? springs : undefined}
+        >
           {memoizedGameBoard.map((row, y) => (
             <div key={y} className={styles.row}>
               {row.map((cell, x) => (

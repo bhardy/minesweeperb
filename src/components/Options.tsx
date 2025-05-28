@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import { format } from "date-fns";
 import { useRouter, usePathname } from "next/navigation";
 import { useMediaQuery } from "@react-hook/media-query";
@@ -41,10 +41,10 @@ export function Options({
   gameSettings,
   setQuickFlagMode,
 }: OptionsProps) {
-  const [recordsOpen, setRecordsOpen] = React.useState(false);
-  const [settingsOpen, setSettingsOpen] = React.useState(false);
-  const [archiveOpen, setArchiveOpen] = React.useState(false);
-  const [dailyStatusOpen, setDailyStatusOpen] = React.useState(false);
+  const [recordsOpen, setRecordsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [dailyStatusOpen, setDailyStatusOpen] = useState(false);
   const isTouchDevice = useMediaQuery("(pointer: coarse)");
 
   const router = useRouter();
