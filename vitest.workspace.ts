@@ -22,6 +22,11 @@ const projects: TestProjectInlineConfiguration[] = [
       exclude: ["**/node_modules/**", "**/dist/**"],
       root: dirname,
     },
+    resolve: {
+      alias: {
+        "@": path.resolve(dirname, "src"),
+      },
+    },
   },
 ];
 
@@ -43,6 +48,11 @@ if (process.env.STORYBOOK_TESTS === "true") {
       globals: true,
       setupFiles: [".storybook/vitest.setup.ts"],
       root: dirname,
+    },
+    resolve: {
+      alias: {
+        "@": path.resolve(dirname, "src"),
+      },
     },
   });
 }
