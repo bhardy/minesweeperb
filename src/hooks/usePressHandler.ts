@@ -79,6 +79,8 @@ export function usePressHandler({
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
+      e.preventDefault();
+
       // Clear existing timeouts (mostly for multi touch)
       clearTimeout(timeoutRef.current);
 

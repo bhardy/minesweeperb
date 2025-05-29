@@ -38,7 +38,11 @@
 - [x] simplify settings (cleaner defaults for mobile and desktop, advanced options as opt-in)
 - [x] remove maximize toggle (temporary?)
 - [x] add toggle for quick-flag mode
+- [x] fix issue where loupe shows on ios
+- [ ] auto size pinch/pan area on touch devices
+- [ ] adjust mobile styles so everything is a bit bigger
 - [ ] add tutorial mode
+- [ ] auto-reveal (chording) should show the user the cells that will reveal while the mouse is down
 - [ ] re-enable isMaximized toggle (removed in ad0e926) but fix the layout shift after local storage hydration
 - [ ] remove click outside to dismiss end-game modals
 - [ ] add keyboard shortcut for new game
