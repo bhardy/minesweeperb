@@ -171,7 +171,7 @@
 
 :global(.dark) {
   .quickFlagMode .cell:not(.revealed):not(.flagged)::before {
-    filter: saturate(0) brightness(1.7);
+    filter: saturate(0);
     opacity: 0.3;
   }
 }
