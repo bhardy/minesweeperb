@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import SadSvg from "@/public/icons/sad.svg";
+import SadSvg from "./svg/sad.svg";
 
 export const SadIcon = ({
   size = 24,

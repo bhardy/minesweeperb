@@ -1,5 +1,5 @@
 import type { SVGProps } from "react";
-import SunglassesSvg from "@/public/icons/sunglasses.svg";
+import SunglassesSvg from "./svg/sunglasses.svg";
 
 export const SunglassesIcon = ({
   size = 24,
