@@ -155,25 +155,50 @@ export const getInitialGameState = (
   width: number,
   height: number,
   config: Level,
-  seed?: string
-): GameState => ({
-  status: "not-started",
-  flaggedMines: 0,
-  remainingCells: width * height,
-  lastClick: undefined,
-  startTime: undefined,
-  endTime: undefined,
-  config,
-  seed,
-});
+  seed?: string,
+  initialBoard?: GameBoard
+): GameState => {
+  const flaggedMines = initialBoard
+    ? initialBoard.reduce(
+        (count, row) =>
+          count +
+          row.reduce(
+            (rowCount, cell) => rowCount + (cell.isFlagged ? 1 : 0),
+            0
+          ),
+        0
+      )
+    : 0;
+
+  return {
+    status: "not-started",
+    flaggedMines,
+    remainingCells: width * height,
+    lastClick: undefined,
+    startTime: undefined,
+    endTime: undefined,
+    config,
+    seed,
+    initialBoard,
+  };
+};
 
 export const fillMines = (
   initialClick: { x: number; y: number },
   gameBoard: GameBoard,
   difficulty: Level,
-  seed?: string
+  seed?: string,
+  initialBoard?: GameBoard
 ): { board: GameBoard; safeCell: { x: number; y: number } } => {
   const { width, height, mines } = difficulty;
+
+  // If we have an initial board, use it directly
+  if (initialBoard) {
+    return {
+      board: initialBoard,
+      safeCell: initialClick,
+    };
+  }
 
   let minePositions: Set<string>;
 
@@ -262,6 +287,20 @@ export const revealCells = (
   }
 
   if (gameState.status === "not-started") {
+    // If we have an initial board, use a copy of the CURRENT gameBoard (with user flags)
+    if (gameState.initialBoard) {
+      const startGameState = {
+        ...gameState,
+        status: "in-progress" as const,
+        startTime: Date.now(),
+      };
+      // Use a deep copy of the current gameBoard (which may have user flags)
+      const boardCopy = gameBoard.map((row) =>
+        row.map((cell) => ({ ...cell }))
+      );
+      return revealCells(cell, boardCopy, startGameState);
+    }
+
     const { board: initialBoard, safeCell } = fillMines(
       cell,
       gameBoard,
@@ -344,8 +383,12 @@ export const revealCells = (
           continue;
         }
 
-        // Skip mines and already revealed cells
-        if (!newBoard[newY][newX].isMine && !newBoard[newY][newX].isRevealed) {
+        // Skip mines, flagged cells, and already revealed cells
+        if (
+          !newBoard[newY][newX].isMine &&
+          !newBoard[newY][newX].isFlagged &&
+          !newBoard[newY][newX].isRevealed
+        ) {
           const result = revealCells({ x: newX, y: newY }, newBoard, gameState);
           newBoard = result.gameBoard;
         }
@@ -486,4 +529,25 @@ export const isNewBestTime = (difficulty: string, time: number): boolean => {
   const store = useStore.getState();
   const bestTime = store.getBestTime(difficulty);
   return !bestTime || time < bestTime.time;
+};
+
+export const convertTutorialBoard = (board: string[][]): GameBoard => {
+  return board.map((row) =>
+    row.map((cell) => {
+      const isFlagged = cell === "🚩";
+      const isMine = cell === "💣" || cell === "🚩";
+
+      const isRevealed = cell.includes("r");
+      const adjacentMines = isRevealed
+        ? parseInt(cell) || 0
+        : parseInt(cell) || 0;
+
+      return {
+        isMine,
+        isRevealed,
+        isFlagged,
+        adjacentMines,
+      };
+    })
+  );
 };

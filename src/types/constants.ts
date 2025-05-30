@@ -33,9 +33,8 @@ export const GAME_MODES = [
     name: "Daily Challenge",
     value: "daily",
   },
-  // hiding this for now so we can merge other changes
-  // {
-  //   name: "Interactive Tutorial",
-  //   value: "tutorial",
-  // },
+  {
+    name: "Interactive Tutorial",
+    value: "tutorial",
+  },
 ];

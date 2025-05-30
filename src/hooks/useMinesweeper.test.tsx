@@ -4,6 +4,7 @@ import { DIFFICULTY_LEVELS } from "../types/constants";
 import * as gameUtils from "../lib/game";
 import { vi, type Mock } from "vitest";
 import { describe, it, expect, beforeEach } from "vitest";
+import type { GameBoard } from "../types/minesweeper";
 
 // Mock the game utilities
 vi.mock("../lib/game", () => ({
@@ -235,5 +236,68 @@ describe("useMinesweeper", () => {
     });
 
     expect(onGameEnd).toHaveBeenCalledWith(mockGameState);
+  });
+
+  it("should initialize with provided initial board", () => {
+    const initialBoard: GameBoard = Array(5)
+      .fill(null)
+      .map(() =>
+        Array(5)
+          .fill(null)
+          .map(() => ({
+            isMine: true,
+            isRevealed: false,
+            isFlagged: false,
+            adjacentMines: 0,
+          }))
+      );
+
+    const { result } = renderHook(() => useMinesweeper({ initialBoard }));
+
+    expect(result.current.gameBoard).toEqual(initialBoard);
+    expect(gameUtils.getInitialGameState).toHaveBeenCalledWith(
+      5, // width from initial board
+      5, // height from initial board
+      {
+        name: "custom",
+        width: 5,
+        height: 5,
+        mines: 25, // all cells are mines in this test board
+      },
+      undefined,
+      initialBoard
+    );
+  });
+
+  it("should prioritize initial board over seed and use custom config", () => {
+    const initialBoard: GameBoard = Array(3)
+      .fill(null)
+      .map(() =>
+        Array(3)
+          .fill(null)
+          .map((_, x) => ({
+            isMine: x === 0, // only first column has mines
+            isRevealed: false,
+            isFlagged: false,
+            adjacentMines: 0,
+          }))
+      );
+
+    const seed = "test-seed";
+    const { result } = renderHook(() => useMinesweeper({ initialBoard, seed }));
+
+    expect(result.current.gameBoard).toEqual(initialBoard);
+    expect(gameUtils.getInitialGameState).toHaveBeenCalledWith(
+      3, // width from initial board
+      3, // height from initial board
+      {
+        name: "custom",
+        width: 3,
+        height: 3,
+        mines: 3, // only first column has mines
+      },
+      seed,
+      initialBoard
+    );
   });
 });

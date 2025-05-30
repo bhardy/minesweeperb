@@ -7,6 +7,7 @@ import {
   useEffect,
 } from "react";
 import type {
+  GameBoard,
   GameBoard as GameBoardType,
   GameState,
   Level,
@@ -27,18 +28,20 @@ type GameAction =
   | { type: "RESET_GAME" }
   | { type: "CHANGE_DIFFICULTY"; payload: { config: Level } };
 
-function gameReducer(
+export function gameReducer(
   state: { gameBoard: GameBoardType; gameState: GameState },
   action: GameAction
 ): { gameBoard: GameBoardType; gameState: GameState } {
   const isGameOver =
     state.gameState.status === "won" || state.gameState.status === "lost";
+  let result;
   switch (action.type) {
     case "REVEAL_CELL": {
       const { x, y } = action.payload;
       if (isGameOver) return state;
       if (state.gameBoard[y][x].isFlagged) return state;
-      return revealCells({ x, y }, state.gameBoard, state.gameState);
+      result = revealCells({ x, y }, state.gameBoard, state.gameState);
+      break;
     }
     case "TOGGLE_FLAG": {
       const { x, y } = action.payload;
@@ -63,40 +66,45 @@ function gameReducer(
         0
       );
 
-      return {
+      result = {
         gameBoard: newBoard,
         gameState: {
           ...state.gameState,
           flaggedMines: newFlagCount,
+          initialBoard: state.gameState.initialBoard,
         },
       };
+      break;
     }
     case "CHORD_CLICK": {
       const { x, y } = action.payload;
       if (!state.gameBoard[y][x].isRevealed) return state;
-      return chordClick({ x, y }, state.gameBoard, state.gameState);
+      result = chordClick({ x, y }, state.gameBoard, state.gameState);
+      break;
     }
     case "RESET_GAME": {
       const initialGameState = getInitialGameState(
         state.gameState.config.width,
         state.gameState.config.height,
         state.gameState.config,
-        state.gameState.seed
+        state.gameState.seed,
+        state.gameState.initialBoard
       );
-      const initialGameBoard = Array.from(
-        { length: state.gameState.config.height },
-        () =>
+      const initialGameBoard =
+        state.gameState.initialBoard ||
+        Array.from({ length: state.gameState.config.height }, () =>
           Array.from({ length: state.gameState.config.width }, () => ({
             isMine: false,
             isRevealed: false,
             isFlagged: false,
             adjacentMines: 0,
           }))
-      );
-      return {
+        );
+      result = {
         gameBoard: initialGameBoard,
         gameState: initialGameState,
       };
+      break;
     }
     case "CHANGE_DIFFICULTY": {
       const { config } = action.payload;
@@ -114,40 +122,71 @@ function gameReducer(
           adjacentMines: 0,
         }))
       );
-      return {
+      result = {
         gameBoard: initialGameBoard,
         gameState: initialGameState,
       };
+      break;
     }
+    default:
+      result = state;
   }
+
+  // Always preserve initialBoard in gameState
+  return {
+    ...result,
+    gameState: {
+      ...result.gameState,
+      initialBoard: state.gameState.initialBoard,
+    },
+  };
 }
 
 interface UseMinesweeperProps {
   seed?: string;
   initialDifficulty?: number;
   onGameEnd?: (gameState: GameState) => void;
+  initialBoard?: GameBoard;
 }
 
 export function useMinesweeper({
   seed,
   initialDifficulty = 0,
   onGameEnd,
+  initialBoard,
 }: UseMinesweeperProps) {
-  const initialConfig = DIFFICULTY_LEVELS[initialDifficulty];
+  // Create config based on initial board if provided, otherwise use difficulty level
+  const initialConfig = initialBoard
+    ? {
+        name: "custom",
+        width: initialBoard[0].length,
+        height: initialBoard.length,
+        mines: initialBoard.reduce(
+          (count, row) =>
+            count +
+            row.reduce((rowCount, cell) => rowCount + (cell.isMine ? 1 : 0), 0),
+          0
+        ),
+      }
+    : DIFFICULTY_LEVELS[initialDifficulty];
+
   const [{ gameBoard, gameState }, dispatch] = useReducer(gameReducer, {
-    gameBoard: Array.from({ length: initialConfig.height }, () =>
-      Array.from({ length: initialConfig.width }, () => ({
-        isMine: false,
-        isRevealed: false,
-        isFlagged: false,
-        adjacentMines: 0,
-      }))
-    ),
+    gameBoard: initialBoard
+      ? initialBoard.map((row) => row.map((cell) => ({ ...cell })))
+      : Array.from({ length: initialConfig.height }, () =>
+          Array.from({ length: initialConfig.width }, () => ({
+            isMine: false,
+            isRevealed: false,
+            isFlagged: false,
+            adjacentMines: 0,
+          }))
+        ),
     gameState: getInitialGameState(
       initialConfig.width,
       initialConfig.height,
       initialConfig,
-      seed
+      seed,
+      initialBoard
     ),
   });
 
