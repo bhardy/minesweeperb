@@ -42,7 +42,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Flagging Mines",
     description:
-      "Right-click (or long press on mobile) to place a flag where you think a mine is. The flag icon (🚩) helps you keep track of potential mine locations. We've given you your first flag, flag the other mine and reveal the safe cells.",
+      "Right-click (or long press on mobile) to place a flag where you think a mine is. The flag icon (🚩) helps you keep track of mine locations. We've given you your first flag, flag the other mine and reveal the safe cells.",
     board: [
       ["1", "💣", "🚩", "1"],
       ["1r", "2r", "2r", "1r"],
@@ -53,7 +53,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Common Pattern (1)",
     description:
-      "Take a look at this 3, since it only touches 3 cells, we can can solve the problem.",
+      "Take a look at this 3, since it only touches 3 unrevealedcells, we can can solve the problem.",
     board: [
       ["r", "r", "r", "r", "r"],
       ["1r", "2r", "3r", "2r", "1r"],
@@ -93,7 +93,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Reduction",
     description:
-      "Common patterns are even more common than they appear on the surface level. Subtracting adjacent flags from visible numbers can help you uncover easier to solve common patterns.",
+      "Common patterns are even more common than they appear on the surface level. Subtracting adjacent flags from visible numbers can help you uncover easier to solve common patterns. Can you find the common pattern?",
     board: [
       ["r", "1r", "🚩", "1r", "r"],
       ["1r", "2r", "3r", "2r", "1r"],
