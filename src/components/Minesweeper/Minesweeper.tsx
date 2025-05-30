@@ -7,7 +7,10 @@ import { Options } from "../Options";
 import { GameBoard } from "./GameBoard";
 import { Timer, Count } from "./Scoreboard";
 import { NewBestTime } from "../NewBestTime";
-import type { GameState } from "@/types/minesweeper";
+import type {
+  GameState,
+  GameBoard as GameBoardType,
+} from "@/types/minesweeper";
 import { useStore } from "@/store";
 import { useMediaQuery } from "@react-hook/media-query";
 import { HappyIcon, SadIcon, SunglassesIcon } from "@/components/icons";
@@ -18,6 +21,7 @@ export const Minesweeper = ({
   onGameEnd,
   initialDifficulty,
   WinDialog,
+  initialBoard,
 }: {
   seed?: string;
   onGameEnd?: (gameState: GameState) => void;
@@ -30,6 +34,7 @@ export const Minesweeper = ({
     difficulty: string;
     seed?: string;
   }>;
+  initialBoard?: GameBoardType;
 }) => {
   const { gameSettings, setQuickFlagMode, resetToDefaultSettings } = useStore();
   const {
@@ -50,6 +55,7 @@ export const Minesweeper = ({
     seed,
     initialDifficulty,
     onGameEnd,
+    initialBoard,
   });
 
   // @note: this is mostly just for development as this can only really happen

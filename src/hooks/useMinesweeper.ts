@@ -27,10 +27,89 @@ type GameAction =
   | { type: "RESET_GAME" }
   | { type: "CHANGE_DIFFICULTY"; payload: { config: Level } };
 
+function getInitialState(
+  initialBoard: GameBoardType | undefined,
+  initialConfig: Level,
+  seed?: string
+) {
+  if (initialBoard) {
+    const flaggedMines = initialBoard.reduce(
+      (count, row) =>
+        count +
+        row.reduce((rowCount, cell) => rowCount + (cell.isFlagged ? 1 : 0), 0),
+      0
+    );
+    const remainingCells = initialBoard.reduce(
+      (count, row) =>
+        count +
+        row.reduce(
+          (rowCount, cell) => rowCount + (!cell.isRevealed ? 1 : 0),
+          0
+        ),
+      0
+    );
+    const hasRevealedCells = initialBoard.some((row) =>
+      row.some((cell) => cell.isRevealed)
+    );
+
+    return {
+      gameBoard: initialBoard,
+      gameState: {
+        status: hasRevealedCells
+          ? ("in-progress" as const)
+          : ("not-started" as const),
+        flaggedMines,
+        remainingCells,
+        config: {
+          name: "tutorial",
+          width: initialBoard[0].length,
+          height: initialBoard.length,
+          mines: initialBoard.reduce(
+            (count, row) =>
+              count +
+              row.reduce(
+                (rowCount, cell) => rowCount + (cell.isMine ? 1 : 0),
+                0
+              ),
+            0
+          ),
+        },
+        startTime: hasRevealedCells ? Date.now() : undefined,
+      },
+      initialBoard,
+    };
+  }
+
+  return {
+    gameBoard: Array.from({ length: initialConfig.height }, () =>
+      Array.from({ length: initialConfig.width }, () => ({
+        isMine: false,
+        isRevealed: false,
+        isFlagged: false,
+        adjacentMines: 0,
+      }))
+    ),
+    gameState: getInitialGameState(
+      initialConfig.width,
+      initialConfig.height,
+      initialConfig,
+      seed
+    ),
+  };
+}
+
 function gameReducer(
-  state: { gameBoard: GameBoardType; gameState: GameState },
+  state: {
+    gameBoard: GameBoardType;
+    gameState: GameState;
+    initialBoard?: GameBoardType;
+  },
   action: GameAction
-): { gameBoard: GameBoardType; gameState: GameState } {
+): {
+  gameBoard: GameBoardType;
+  gameState: GameState;
+  initialBoard?: GameBoardType;
+} {
   const isGameOver =
     state.gameState.status === "won" || state.gameState.status === "lost";
   switch (action.type) {
@@ -64,6 +143,7 @@ function gameReducer(
       );
 
       return {
+        ...state,
         gameBoard: newBoard,
         gameState: {
           ...state.gameState,
@@ -77,25 +157,14 @@ function gameReducer(
       return chordClick({ x, y }, state.gameBoard, state.gameState);
     }
     case "RESET_GAME": {
-      const initialGameState = getInitialGameState(
-        state.gameState.config.width,
-        state.gameState.config.height,
+      const initialState = getInitialState(
+        state.initialBoard,
         state.gameState.config,
         state.gameState.seed
       );
-      const initialGameBoard = Array.from(
-        { length: state.gameState.config.height },
-        () =>
-          Array.from({ length: state.gameState.config.width }, () => ({
-            isMine: false,
-            isRevealed: false,
-            isFlagged: false,
-            adjacentMines: 0,
-          }))
-      );
       return {
-        gameBoard: initialGameBoard,
-        gameState: initialGameState,
+        ...state,
+        ...initialState,
       };
     }
     case "CHANGE_DIFFICULTY": {
@@ -115,6 +184,7 @@ function gameReducer(
         }))
       );
       return {
+        ...state,
         gameBoard: initialGameBoard,
         gameState: initialGameState,
       };
@@ -126,30 +196,21 @@ interface UseMinesweeperProps {
   seed?: string;
   initialDifficulty?: number;
   onGameEnd?: (gameState: GameState) => void;
+  initialBoard?: GameBoardType;
 }
 
 export function useMinesweeper({
   seed,
   initialDifficulty = 0,
   onGameEnd,
+  initialBoard,
 }: UseMinesweeperProps) {
   const initialConfig = DIFFICULTY_LEVELS[initialDifficulty];
-  const [{ gameBoard, gameState }, dispatch] = useReducer(gameReducer, {
-    gameBoard: Array.from({ length: initialConfig.height }, () =>
-      Array.from({ length: initialConfig.width }, () => ({
-        isMine: false,
-        isRevealed: false,
-        isFlagged: false,
-        adjacentMines: 0,
-      }))
-    ),
-    gameState: getInitialGameState(
-      initialConfig.width,
-      initialConfig.height,
-      initialConfig,
-      seed
-    ),
-  });
+
+  const [{ gameBoard, gameState }, dispatch] = useReducer(
+    gameReducer,
+    getInitialState(initialBoard, initialConfig, seed)
+  );
 
   const memoizedGameBoard = useMemo(() => gameBoard, [gameBoard]);
 
@@ -187,71 +248,52 @@ export function useMinesweeper({
     setWinTime(null);
   }, []);
 
-  const handleDifficultyChange = useCallback((newDifficulty: number) => {
+  const handleDifficultyChange = useCallback((difficulty: number) => {
     dispatch({
       type: "CHANGE_DIFFICULTY",
-      payload: {
-        config: DIFFICULTY_LEVELS[newDifficulty],
-      },
+      payload: { config: DIFFICULTY_LEVELS[difficulty] },
     });
   }, []);
 
-  const handlePrimaryAction = useCallback(
-    (x: number, y: number) => {
-      dispatch({ type: "REVEAL_CELL", payload: { x, y } });
-    },
-    [dispatch]
-  );
+  const handlePrimaryAction = useCallback((x: number, y: number) => {
+    dispatch({ type: "REVEAL_CELL", payload: { x, y } });
+  }, []);
 
-  const handleSecondaryAction = useCallback(
-    (x: number, y: number) => {
-      dispatch({ type: "TOGGLE_FLAG", payload: { x, y } });
-    },
-    [dispatch]
-  );
+  const handleSecondaryAction = useCallback((x: number, y: number) => {
+    dispatch({ type: "TOGGLE_FLAG", payload: { x, y } });
+  }, []);
 
-  const handleTertiaryAction = useCallback(
-    (x: number, y: number) => {
-      dispatch({ type: "CHORD_CLICK", payload: { x, y } });
-    },
-    [dispatch]
-  );
-
-  const handleGameWin = useCallback(
-    (time: number) => {
-      if (isNewBestTime(currentConfig.name, time)) {
-        setWinTime(time);
-        setShowBestTimeDialog(true);
-      }
-      if (seed) {
-        setWinTime(time);
-        setShowBestTimeDialog(true);
-      }
-    },
-    [currentConfig.name, seed]
-  );
-
-  useEffect(() => {
-    if (
-      gameState.status === "won" &&
-      gameState.endTime &&
-      gameState.startTime
-    ) {
-      const time = Math.floor((gameState.endTime - gameState.startTime) / 1000);
-      handleGameWin(time);
-    }
-  }, [handleGameWin, gameState.status, gameState.endTime, gameState.startTime]);
+  const handleTertiaryAction = useCallback((x: number, y: number) => {
+    dispatch({ type: "CHORD_CLICK", payload: { x, y } });
+  }, []);
 
   const handleBestTimeSubmit = useCallback(
     (name: string) => {
-      if (winTime !== null) {
-        saveBestTime(currentConfig.name, name, winTime);
-        setShowBestTimeDialog(false);
-        setWinTime(null);
+      if (winTime) {
+        saveBestTime(gameState.config.name, name, winTime);
       }
+      setShowBestTimeDialog(false);
     },
-    [currentConfig.name, winTime]
+    [gameState.config.name, winTime]
   );
+
+  useEffect(() => {
+    if (gameState.status === "won" && !showBestTimeDialog) {
+      const time = gameState.endTime
+        ? Math.floor((gameState.endTime - (gameState.startTime || 0)) / 1000)
+        : 0;
+      if (isNewBestTime(gameState.config.name, time)) {
+        setWinTime(time);
+        setShowBestTimeDialog(true);
+      }
+    }
+  }, [
+    gameState.status,
+    gameState.config.name,
+    gameState.endTime,
+    gameState.startTime,
+    showBestTimeDialog,
+  ]);
 
   return {
     gameBoard: memoizedGameBoard,
@@ -265,7 +307,6 @@ export function useMinesweeper({
     handlePrimaryAction,
     handleSecondaryAction,
     handleTertiaryAction,
-    handleGameWin,
     handleBestTimeSubmit,
     setShowBestTimeDialog,
   };

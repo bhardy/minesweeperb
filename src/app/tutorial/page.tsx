@@ -1,12 +1,11 @@
-import { Minesweeper } from "@/components/Minesweeper/Minesweeper";
-import { Suspense } from "react";
+"use client";
 
-export default async function Tutorial() {
+import { TutorialStep } from "@/components/Minesweeper/TutorialStep";
+
+export default function Tutorial() {
   return (
-    <main className="flex flex-col flex-1 font-[family-name:var(--font-geist-sans)]">
-      <Suspense>
-        <Minesweeper />
-      </Suspense>
+    <main className="flex flex-col flex-1 font-[family-name:var(--font-geist-sans)] p-4">
+      <TutorialStep />
     </main>
   );
 }

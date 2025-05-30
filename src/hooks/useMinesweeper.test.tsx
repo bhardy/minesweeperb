@@ -160,7 +160,7 @@ describe("useMinesweeper", () => {
       ...result.current.gameState,
       status: "won",
       endTime: Date.now(),
-      startTime: Date.now() - 1000, // 1 second ago
+      startTime: Date.now() - 100000, // 100 seconds ago
     };
 
     (gameUtils.revealCells as Mock).mockReturnValue({
@@ -173,21 +173,53 @@ describe("useMinesweeper", () => {
     });
 
     expect(result.current.showBestTimeDialog).toBe(true);
-    expect(result.current.winTime).toBe(1); // 1 second
+    expect(result.current.winTime).toBe(100); // 100 seconds
   });
 
-  it("should handle best time submission", () => {
+  it("should handle best time submission", async () => {
     const { result } = renderHook(() => useMinesweeper({}));
 
-    // Set up win time
-    act(() => {
-      result.current.handleGameWin(100);
+    // Mock a win condition
+    (gameUtils.isNewBestTime as Mock).mockReturnValue(true);
+
+    // Mock the game state to be in a winning state
+    const mockGameState = {
+      ...result.current.gameState,
+      status: "won",
+      endTime: Date.now(),
+      startTime: Date.now() - 100000, // 100 seconds ago
+    };
+
+    (gameUtils.revealCells as Mock).mockReturnValue({
+      gameBoard: result.current.gameBoard,
+      gameState: mockGameState,
     });
 
+    // Reset the dialog state
     act(() => {
+      result.current.setShowBestTimeDialog(false);
+    });
+
+    // Trigger a win through the reducer
+    act(() => {
+      result.current.handlePrimaryAction(0, 0);
+    });
+
+    // Wait for effect to run
+    act(() => {
+      result.current.gameState = { ...result.current.gameState };
+    });
+
+    // Submit the best time
+    await act(async () => {
       result.current.handleBestTimeSubmit("Test Player");
+      result.current.resetGame();
     });
 
+    // Wait for the dialog to close and winTime to be cleared
+    await act(async () => {
+      await Promise.resolve();
+    });
     expect(gameUtils.saveBestTime).toHaveBeenCalledWith(
       DIFFICULTY_LEVELS[0].name,
       "Test Player",
