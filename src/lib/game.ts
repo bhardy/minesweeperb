@@ -487,3 +487,25 @@ export const isNewBestTime = (difficulty: string, time: number): boolean => {
   const bestTime = store.getBestTime(difficulty);
   return !bestTime || time < bestTime.time;
 };
+
+export const convertTutorialBoard = (board: string[][]): GameBoard => {
+  console.log({ board });
+  return board.map((row) =>
+    row.map((cell) => {
+      const isFlagged = cell === "🚩";
+      const isMine = cell === "💣" || cell === "🚩";
+
+      const isRevealed = cell.includes("r");
+      const adjacentMines = isRevealed
+        ? parseInt(cell) || 0
+        : parseInt(cell) || 0;
+
+      return {
+        isMine,
+        isRevealed,
+        isFlagged,
+        adjacentMines,
+      };
+    })
+  );
+};
