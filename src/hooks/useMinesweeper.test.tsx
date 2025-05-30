@@ -4,7 +4,7 @@ import { DIFFICULTY_LEVELS } from "../types/constants";
 import * as gameUtils from "../lib/game";
 import { vi, type Mock } from "vitest";
 import { describe, it, expect, beforeEach } from "vitest";
-import type { GameBoard } from "@/types/minesweeper";
+import type { GameBoard } from "../types/minesweeper";
 
 // Mock the game utilities
 vi.mock("../lib/game", () => ({

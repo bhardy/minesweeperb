@@ -6,31 +6,24 @@ import { TutorialBoard } from "./TutorialBoard";
 
 export const TutorialStep = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const progress = (currentStep / tutorialSteps.length) * 100;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <Progress
-          value={currentStep}
-          max={tutorialSteps.length}
-          className="w-full"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{tutorialSteps[currentStep].title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{tutorialSteps[currentStep].description}</p>
-          </CardContent>
-        </Card>
-
-        <div className="flex items-center justify-center">
-          <TutorialBoard step={currentStep} onStepChange={setCurrentStep} />
+    <Card className="w-full max-w-md mx-auto my-auto">
+      <CardHeader>
+        <CardTitle>{tutorialSteps[currentStep].title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>{tutorialSteps[currentStep].description}</p>
+        <div className="flex items-center justify-center my-8">
+          <TutorialBoard
+            key={currentStep}
+            step={currentStep}
+            onStepChange={setCurrentStep}
+          />
         </div>
-      </div>
-    </div>
+        <Progress value={progress} className="w-full max-w-md my-8" />
+      </CardContent>
+    </Card>
   );
 };

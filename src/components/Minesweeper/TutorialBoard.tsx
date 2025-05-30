@@ -103,10 +103,14 @@ export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent>
+        <DialogContent
+          onInteractOutside={(e) => {
+            e.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>
-              {gameState.status === "won" ? "Great job!" : "Try again!"}
+              {gameState.status === "won" ? "Great job!" : "Not quite!"}
             </DialogTitle>
             <DialogDescription className="sr-only">
               {gameState.status === "won"

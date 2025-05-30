@@ -32,23 +32,6 @@ export function gameReducer(
   state: { gameBoard: GameBoardType; gameState: GameState },
   action: GameAction
 ): { gameBoard: GameBoardType; gameState: GameState } {
-  // Debug log: print action and board state before
-  if (typeof window !== "undefined") {
-    console.log("%c[Reducer] Action:", "color: #0af", action);
-    console.log(
-      "%c[Reducer] Board before:",
-      "color: #0af",
-      state.gameBoard.map((row) =>
-        row.map((cell) => ({
-          isMine: cell.isMine,
-          isFlagged: cell.isFlagged,
-          isRevealed: cell.isRevealed,
-          adjacentMines: cell.adjacentMines,
-        }))
-      )
-    );
-  }
-
   const isGameOver =
     state.gameState.status === "won" || state.gameState.status === "lost";
   let result;
@@ -147,22 +130,6 @@ export function gameReducer(
     }
     default:
       result = state;
-  }
-
-  // Debug log: print board state after
-  if (typeof window !== "undefined") {
-    console.log(
-      "%c[Reducer] Board after:",
-      "color: #fa0",
-      result.gameBoard.map((row) =>
-        row.map((cell) => ({
-          isMine: cell.isMine,
-          isFlagged: cell.isFlagged,
-          isRevealed: cell.isRevealed,
-          adjacentMines: cell.adjacentMines,
-        }))
-      )
-    );
   }
 
   // Always preserve initialBoard in gameState
