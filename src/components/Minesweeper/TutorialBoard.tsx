@@ -41,8 +41,6 @@ export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
     },
   });
 
-  console.log(gameBoard);
-
   // @note: this is mostly just for development as this can only really happen
   // if the user toggles settings in dev tools
   const isTouchDevice = useMediaQuery("(pointer: coarse)");

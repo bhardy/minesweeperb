@@ -155,7 +155,8 @@ export const getInitialGameState = (
   width: number,
   height: number,
   config: Level,
-  seed?: string
+  seed?: string,
+  initialBoard?: GameBoard
 ): GameState => ({
   status: "not-started",
   flaggedMines: 0,
@@ -165,15 +166,25 @@ export const getInitialGameState = (
   endTime: undefined,
   config,
   seed,
+  initialBoard,
 });
 
 export const fillMines = (
   initialClick: { x: number; y: number },
   gameBoard: GameBoard,
   difficulty: Level,
-  seed?: string
+  seed?: string,
+  initialBoard?: GameBoard
 ): { board: GameBoard; safeCell: { x: number; y: number } } => {
   const { width, height, mines } = difficulty;
+
+  // If we have an initial board, use it directly
+  if (initialBoard) {
+    return {
+      board: initialBoard,
+      safeCell: initialClick,
+    };
+  }
 
   let minePositions: Set<string>;
 
@@ -266,7 +277,8 @@ export const revealCells = (
       cell,
       gameBoard,
       gameState.config,
-      gameState.seed
+      gameState.seed,
+      gameState.initialBoard
     );
     const startGameState = {
       ...gameState,
@@ -489,7 +501,6 @@ export const isNewBestTime = (difficulty: string, time: number): boolean => {
 };
 
 export const convertTutorialBoard = (board: string[][]): GameBoard => {
-  console.log({ board });
   return board.map((row) =>
     row.map((cell) => {
       const isFlagged = cell === "🚩";
