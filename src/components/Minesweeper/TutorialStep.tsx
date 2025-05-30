@@ -6,7 +6,7 @@ import { TutorialBoard } from "./TutorialBoard";
 
 export const TutorialStep = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const progress = (currentStep / tutorialSteps.length) * 100;
+  const progress = ((currentStep + 1) / tutorialSteps.length) * 100;
 
   return (
     <Card className="w-full max-w-md mx-auto my-auto">
