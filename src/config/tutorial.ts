@@ -23,7 +23,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Numbers and Mines",
     description:
-      "After clicking to reveal a cell, you'll see some combination of empty cells and cells with numbers. The numbers give you a count of how many of the adjacent cells are mines. In this example, you can see that we have 1 remaining mine and 2 unrevealed cells. See if you can reveal the safe cell.",
+      "After cells are revealed you'll see a combination of empty cells and cells with numbers. The number is a count of how many of the adjacent cells are mines. In this example, you can see that we have 1 remaining mine and 2 unrevealed cells. See if you can reveal the safe cell.",
     board: [
       ["1", "💣", "1r", "r"],
       ["1r", "1r", "1r", "r"],

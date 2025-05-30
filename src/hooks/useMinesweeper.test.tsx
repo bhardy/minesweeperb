@@ -4,6 +4,7 @@ import { DIFFICULTY_LEVELS } from "../types/constants";
 import * as gameUtils from "../lib/game";
 import { vi, type Mock } from "vitest";
 import { describe, it, expect, beforeEach } from "vitest";
+import type { GameBoard } from "@/types/minesweeper";
 
 // Mock the game utilities
 vi.mock("../lib/game", () => ({
@@ -160,7 +161,7 @@ describe("useMinesweeper", () => {
       ...result.current.gameState,
       status: "won",
       endTime: Date.now(),
-      startTime: Date.now() - 100000, // 100 seconds ago
+      startTime: Date.now() - 1000, // 1 second ago
     };
 
     (gameUtils.revealCells as Mock).mockReturnValue({
@@ -173,53 +174,21 @@ describe("useMinesweeper", () => {
     });
 
     expect(result.current.showBestTimeDialog).toBe(true);
-    expect(result.current.winTime).toBe(100); // 100 seconds
+    expect(result.current.winTime).toBe(1); // 1 second
   });
 
-  it("should handle best time submission", async () => {
+  it("should handle best time submission", () => {
     const { result } = renderHook(() => useMinesweeper({}));
 
-    // Mock a win condition
-    (gameUtils.isNewBestTime as Mock).mockReturnValue(true);
-
-    // Mock the game state to be in a winning state
-    const mockGameState = {
-      ...result.current.gameState,
-      status: "won",
-      endTime: Date.now(),
-      startTime: Date.now() - 100000, // 100 seconds ago
-    };
-
-    (gameUtils.revealCells as Mock).mockReturnValue({
-      gameBoard: result.current.gameBoard,
-      gameState: mockGameState,
-    });
-
-    // Reset the dialog state
+    // Set up win time
     act(() => {
-      result.current.setShowBestTimeDialog(false);
+      result.current.handleGameWin(100);
     });
 
-    // Trigger a win through the reducer
     act(() => {
-      result.current.handlePrimaryAction(0, 0);
-    });
-
-    // Wait for effect to run
-    act(() => {
-      result.current.gameState = { ...result.current.gameState };
-    });
-
-    // Submit the best time
-    await act(async () => {
       result.current.handleBestTimeSubmit("Test Player");
-      result.current.resetGame();
     });
 
-    // Wait for the dialog to close and winTime to be cleared
-    await act(async () => {
-      await Promise.resolve();
-    });
     expect(gameUtils.saveBestTime).toHaveBeenCalledWith(
       DIFFICULTY_LEVELS[0].name,
       "Test Player",
@@ -267,5 +236,68 @@ describe("useMinesweeper", () => {
     });
 
     expect(onGameEnd).toHaveBeenCalledWith(mockGameState);
+  });
+
+  it("should initialize with provided initial board", () => {
+    const initialBoard: GameBoard = Array(5)
+      .fill(null)
+      .map(() =>
+        Array(5)
+          .fill(null)
+          .map(() => ({
+            isMine: true,
+            isRevealed: false,
+            isFlagged: false,
+            adjacentMines: 0,
+          }))
+      );
+
+    const { result } = renderHook(() => useMinesweeper({ initialBoard }));
+
+    expect(result.current.gameBoard).toBe(initialBoard);
+    expect(gameUtils.getInitialGameState).toHaveBeenCalledWith(
+      5, // width from initial board
+      5, // height from initial board
+      {
+        name: "custom",
+        width: 5,
+        height: 5,
+        mines: 25, // all cells are mines in this test board
+      },
+      undefined,
+      initialBoard
+    );
+  });
+
+  it("should prioritize initial board over seed and use custom config", () => {
+    const initialBoard: GameBoard = Array(3)
+      .fill(null)
+      .map(() =>
+        Array(3)
+          .fill(null)
+          .map((_, x) => ({
+            isMine: x === 0, // only first column has mines
+            isRevealed: false,
+            isFlagged: false,
+            adjacentMines: 0,
+          }))
+      );
+
+    const seed = "test-seed";
+    const { result } = renderHook(() => useMinesweeper({ initialBoard, seed }));
+
+    expect(result.current.gameBoard).toBe(initialBoard);
+    expect(gameUtils.getInitialGameState).toHaveBeenCalledWith(
+      3, // width from initial board
+      3, // height from initial board
+      {
+        name: "custom",
+        width: 3,
+        height: 3,
+        mines: 3, // only first column has mines
+      },
+      seed,
+      initialBoard
+    );
   });
 });
