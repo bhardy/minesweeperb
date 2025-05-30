@@ -254,7 +254,7 @@ describe("useMinesweeper", () => {
 
     const { result } = renderHook(() => useMinesweeper({ initialBoard }));
 
-    expect(result.current.gameBoard).toBe(initialBoard);
+    expect(result.current.gameBoard).toEqual(initialBoard);
     expect(gameUtils.getInitialGameState).toHaveBeenCalledWith(
       5, // width from initial board
       5, // height from initial board
@@ -286,7 +286,7 @@ describe("useMinesweeper", () => {
     const seed = "test-seed";
     const { result } = renderHook(() => useMinesweeper({ initialBoard, seed }));
 
-    expect(result.current.gameBoard).toBe(initialBoard);
+    expect(result.current.gameBoard).toEqual(initialBoard);
     expect(gameUtils.getInitialGameState).toHaveBeenCalledWith(
       3, // width from initial board
       3, // height from initial board

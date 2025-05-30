@@ -157,17 +157,31 @@ export const getInitialGameState = (
   config: Level,
   seed?: string,
   initialBoard?: GameBoard
-): GameState => ({
-  status: "not-started",
-  flaggedMines: 0,
-  remainingCells: width * height,
-  lastClick: undefined,
-  startTime: undefined,
-  endTime: undefined,
-  config,
-  seed,
-  initialBoard,
-});
+): GameState => {
+  const flaggedMines = initialBoard
+    ? initialBoard.reduce(
+        (count, row) =>
+          count +
+          row.reduce(
+            (rowCount, cell) => rowCount + (cell.isFlagged ? 1 : 0),
+            0
+          ),
+        0
+      )
+    : 0;
+
+  return {
+    status: "not-started",
+    flaggedMines,
+    remainingCells: width * height,
+    lastClick: undefined,
+    startTime: undefined,
+    endTime: undefined,
+    config,
+    seed,
+    initialBoard,
+  };
+};
 
 export const fillMines = (
   initialClick: { x: number; y: number },
@@ -273,12 +287,25 @@ export const revealCells = (
   }
 
   if (gameState.status === "not-started") {
+    // If we have an initial board, use a copy of the CURRENT gameBoard (with user flags)
+    if (gameState.initialBoard) {
+      const startGameState = {
+        ...gameState,
+        status: "in-progress" as const,
+        startTime: Date.now(),
+      };
+      // Use a deep copy of the current gameBoard (which may have user flags)
+      const boardCopy = gameBoard.map((row) =>
+        row.map((cell) => ({ ...cell }))
+      );
+      return revealCells(cell, boardCopy, startGameState);
+    }
+
     const { board: initialBoard, safeCell } = fillMines(
       cell,
       gameBoard,
       gameState.config,
-      gameState.seed,
-      gameState.initialBoard
+      gameState.seed
     );
     const startGameState = {
       ...gameState,
@@ -356,8 +383,12 @@ export const revealCells = (
           continue;
         }
 
-        // Skip mines and already revealed cells
-        if (!newBoard[newY][newX].isMine && !newBoard[newY][newX].isRevealed) {
+        // Skip mines, flagged cells, and already revealed cells
+        if (
+          !newBoard[newY][newX].isMine &&
+          !newBoard[newY][newX].isFlagged &&
+          !newBoard[newY][newX].isRevealed
+        ) {
           const result = revealCells({ x: newX, y: newY }, newBoard, gameState);
           newBoard = result.gameBoard;
         }
