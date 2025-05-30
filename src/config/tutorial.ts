@@ -36,10 +36,10 @@ export const tutorialSteps: TutorialStep[] = [
     description:
       "Right-click (or long press on mobile) to place a flag where you think a mine is. The flag icon (🚩) helps you keep track of potential mine locations.",
     board: [
-      ["", "", "", ""],
-      ["", "2r", "🚩", ""],
-      ["", "", "", ""],
-      ["", "", "", ""],
+      ["1", "💣", "🚩", "1"],
+      ["1r", "2r", "2r", "1r"],
+      ["r", "r", "r", "r"],
+      ["r", "r", "r", "r"],
     ],
     showMineCount: true,
   },

@@ -54,6 +54,7 @@
 - [ ] add question marks
 - [ ] address stuck focus state on cells
 - [ ] when holding quick reveal there's sometimes a bug where the user can see the revealed cell and then not reveal it
+- [ ] clean up how an initial board is passed to useMinesweeper
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

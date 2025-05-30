@@ -11,6 +11,7 @@ import { getTutorialBoard, tutorialSteps } from "@/config/tutorial";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -107,6 +108,11 @@ export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
             <DialogTitle>
               {gameState.status === "won" ? "Great job!" : "Try again!"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {gameState.status === "won"
+                ? "You completed the step."
+                : "You made a mistake, try again."}
+            </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <p>
