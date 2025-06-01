@@ -7,7 +7,7 @@ import { useStore } from "@/store";
 import { useMediaQuery } from "@react-hook/media-query";
 import { HappyIcon, SadIcon, SunglassesIcon } from "@/components/icons";
 import { useMinesweeper } from "@/hooks/useMinesweeper";
-import { getTutorialBoard, tutorialSteps } from "@/config/tutorial";
+import { getTutorialBoard } from "@/config/tutorial";
 import {
   Dialog,
   DialogContent,
@@ -16,17 +16,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import type { GameState } from "@/types/minesweeper";
 
 interface TutorialBoardProps {
   step: number;
-  onStepChange: (step: number) => void;
+  onGameStateChange: (gameState: GameState) => void;
 }
 
-export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
-  const router = useRouter();
-  const [showModal, setShowModal] = useState(false);
+export const TutorialBoard = ({
+  step,
+  onGameStateChange,
+}: TutorialBoardProps) => {
   const { gameSettings, resetToDefaultSettings } = useStore();
+  const [showModal, setShowModal] = useState(false);
   const {
     gameBoard,
     gameState,
@@ -38,9 +40,15 @@ export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
   } = useMinesweeper({
     initialBoard: getTutorialBoard(step),
     onGameEnd: () => {
-      setShowModal(true);
+      if (gameState.status === "lost") {
+        setShowModal(true);
+      }
     },
   });
+
+  useEffect(() => {
+    onGameStateChange(gameState);
+  }, [gameState, onGameStateChange]);
 
   // @note: this is mostly just for development as this can only really happen
   // if the user toggles settings in dev tools
@@ -48,21 +56,6 @@ export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
   useEffect(() => {
     resetToDefaultSettings();
   }, [isTouchDevice, resetToDefaultSettings]);
-
-  const handleNext = () => {
-    setShowModal(false);
-    if (step < tutorialSteps.length - 1) {
-      onStepChange(step + 1);
-      resetGame();
-    } else {
-      router.push("/");
-    }
-  };
-
-  const handleRetry = () => {
-    setShowModal(false);
-    resetGame();
-  };
 
   return (
     <>
@@ -109,31 +102,18 @@ export const TutorialBoard = ({ step, onStepChange }: TutorialBoardProps) => {
           }}
         >
           <DialogHeader>
-            <DialogTitle>
-              {gameState.status === "won" ? "Great job!" : "Not quite!"}
-            </DialogTitle>
+            <DialogTitle>Not quite!</DialogTitle>
             <DialogDescription className="sr-only">
-              {gameState.status === "won"
-                ? "You completed the step."
-                : "You made a mistake, try again."}
+              You made a mistake, try again.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <p>
-              {gameState.status === "won"
-                ? step < tutorialSteps.length - 1
-                  ? "You've completed this step! Ready for the next one?"
-                  : "You've completed the tutorial! Ready to play the real game?"
-                : "Don't worry, you can try this step again!"}
+              Don&apos;t worry, you can try again by clicking the game reset
+              button (🙁).
             </p>
             <div className="flex justify-end gap-2">
-              {gameState.status === "won" ? (
-                <Button onClick={handleNext}>
-                  {step < tutorialSteps.length - 1 ? "Next Step" : "Play Game"}
-                </Button>
-              ) : (
-                <Button onClick={handleRetry}>Try Again</Button>
-              )}
+              <Button onClick={() => setShowModal(false)}>Okay</Button>
             </div>
           </div>
         </DialogContent>
