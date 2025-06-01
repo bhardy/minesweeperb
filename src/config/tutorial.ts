@@ -9,9 +9,9 @@ export interface TutorialStep {
 
 export const tutorialSteps: TutorialStep[] = [
   {
-    title: "Revealing Cells",
+    title: "Introduction",
     description:
-      "The goal of Minesweeper is to reveal every cell that doesn't contain a mine. You can see your mine count in the top-left, in this (contrived) example, we have 0 mines, so we know all the cells are safe and we can click any cell on the board below.",
+      "Below you'll see a mine counter (0), your start/re-start game button (🙂) and a minefield (or board). Click the board to get started.",
     board: [
       ["", "", "", ""],
       ["", "", "", ""],
@@ -19,9 +19,9 @@ export const tutorialSteps: TutorialStep[] = [
     ],
   },
   {
-    title: "Safe Zones",
+    title: "Revealing Cells",
     description:
-      "When you reveal a cell with no adjacent mines, it automatically reveals all connected safe cells. Click and reveal a safe cell.",
+      "The goal is to reveal every cell without a mine. When you reveal a cell with no adjacent mines, it automatically reveals all connected safe cells. Since we have a remaining mine count of 0, click anywhere to reveal a safe cell.",
     board: [
       ["🚩", "1r", "", ""],
       ["1r", "1r", "", ""],
@@ -32,7 +32,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Numbers and Mines",
     description:
-      "After cells are revealed you'll see a combination of empty cells and cells with numbers. The number is a count of how many of the adjacent cells are mines. In this example, you can see that we have 1 remaining mine and 2 unrevealed cells. See if you can reveal the safe cell.",
+      "Revealed cells will either be empty or contain a number. The number is a count of how many of the touching cells (including diagonals) are mines. In this example, you can see that we have 1 remaining mine and 2 unrevealed cells. See if you can reveal the safe cell.",
     board: [
       ["1", "💣", "1r", "r"],
       ["1r", "1r", "1r", "r"],
@@ -42,7 +42,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Flagging Mines",
     description:
-      "Right-click (or long press on mobile) to place a flag where you think a mine is. The flag icon (🚩) helps you keep track of mine locations. We've given you your first flag, flag the other mine and reveal the safe cells.",
+      "Right-click (or long press on mobile) to place a flag where you think a mine is and 1 will be deducted from the mine counter. Flags help you avoid clicking on mines. We've given you your first flag, flag the other mine and reveal the safe cells.",
     board: [
       ["1", "💣", "🚩", "1"],
       ["1r", "2r", "2r", "1r"],
