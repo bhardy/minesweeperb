@@ -53,7 +53,7 @@ export const tutorialSteps: TutorialStep[] = [
   {
     title: "Common Pattern (1)",
     description:
-      "Take a look at this 3, since it only touches 3 unrevealedcells, we can can solve the problem.",
+      "Take a look at this 3, since it only touches 3 unrevealed cells, we can can solve the problem.",
     board: [
       ["r", "r", "r", "r", "r"],
       ["1r", "2r", "3r", "2r", "1r"],
